@@ -12,11 +12,11 @@ $(document).ready(function () {
 
 $("#play-sound").click(function () {
   gainSum = 0;
-  for (var i = 0; i <= 10; i++) {
+  for (var i = 0; i <= 13; i++) {
     gainSum += $("#gain-control-" + i).val() / 100;
   }
 
-  for (var i = 0; i <= 10; i++) {
+  for (var i = 0; i <= 13; i++) {
     createOscilator(100 * (i+1), $("#gain-control-" + i).val() / (100 * gainSum));
   }
 });
