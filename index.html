@@ -8,68 +8,6 @@
     <link rel="stylesheet" href="css/app.css">
   </head>
   <body>
-
-    <div class="slider vertical" data-slider data-initial-start="70" data-end="100" data-vertical="true">
-      <span class="slider-handle" data-slider-handle role="slider" tabindex="1"></span>
-      <span class="slider-fill" data-slider-fill></span>
-      <input id="gain-control-0" type="hidden">
-    </div>
-    <div class="slider vertical" data-slider data-initial-start="0" data-end="100" data-vertical="true">
-      <span class="slider-handle" data-slider-handle role="slider" tabindex="1"></span>
-      <span class="slider-fill" data-slider-fill></span>
-      <input id="gain-control-1" type="hidden">
-    </div>
-    <div class="slider vertical" data-slider data-initial-start="0" data-end="100" data-vertical="true">
-      <span class="slider-handle" data-slider-handle role="slider" tabindex="1"></span>
-      <span class="slider-fill" data-slider-fill></span>
-      <input id="gain-control-2" type="hidden">
-    </div>
-    <div class="slider vertical" data-slider data-initial-start="0" data-end="100" data-vertical="true">
-      <span class="slider-handle" data-slider-handle role="slider" tabindex="1"></span>
-      <span class="slider-fill" data-slider-fill></span>
-      <input id="gain-control-3" type="hidden">
-    </div>
-    <div class="slider vertical" data-slider data-initial-start="0" data-end="100" data-vertical="true">
-      <span class="slider-handle" data-slider-handle role="slider" tabindex="1"></span>
-      <span class="slider-fill" data-slider-fill></span>
-      <input id="gain-control-4" type="hidden">
-    </div>
-    <div class="slider vertical" data-slider data-initial-start="0" data-end="100" data-vertical="true">
-      <span class="slider-handle" data-slider-handle role="slider" tabindex="1"></span>
-      <span class="slider-fill" data-slider-fill></span>
-      <input id="gain-control-5" type="hidden">
-    </div>
-    <div class="slider vertical" data-slider data-initial-start="0" data-end="100" data-vertical="true">
-      <span class="slider-handle" data-slider-handle role="slider" tabindex="1"></span>
-      <span class="slider-fill" data-slider-fill></span>
-      <input id="gain-control-6" type="hidden">
-    </div>
-    <div class="slider vertical" data-slider data-initial-start="0" data-end="100" data-vertical="true">
-      <span class="slider-handle" data-slider-handle role="slider" tabindex="1"></span>
-      <span class="slider-fill" data-slider-fill></span>
-      <input id="gain-control-7" type="hidden">
-    </div>
-    <div class="slider vertical" data-slider data-initial-start="0" data-end="100" data-vertical="true">
-      <span class="slider-handle" data-slider-handle role="slider" tabindex="1"></span>
-      <span class="slider-fill" data-slider-fill></span>
-      <input id="gain-control-8" type="hidden">
-    </div>
-    <div class="slider vertical" data-slider data-initial-start="0" data-end="100" data-vertical="true">
-      <span class="slider-handle" data-slider-handle role="slider" tabindex="1"></span>
-      <span class="slider-fill" data-slider-fill></span>
-      <input id="gain-control-9" type="hidden">
-    </div>
-    <div class="slider vertical" data-slider data-initial-start="0" data-end="100" data-vertical="true">
-      <span class="slider-handle" data-slider-handle role="slider" tabindex="1"></span>
-      <span class="slider-fill" data-slider-fill></span>
-      <input id="gain-control-10" type="hidden">
-    </div>
-    <div class="slider vertical" data-slider data-initial-start="0" data-end="100" data-vertical="true">
-      <span class="slider-handle" data-slider-handle role="slider" tabindex="1"></span>
-      <span class="slider-fill" data-slider-fill></span>
-      <input id="gain-control-11" type="hidden">
-    </div>
-    <div class="slider vertical" data-slider data-initial-start="0" data-end="100" data-vertical="true">
     <button type="button" id="play-sound" class="button">Play</button>
     <br>
     <div id="number-overtones-slider" class="slider" data-slider data-initial-start="10" data-end="25">
@@ -78,10 +16,13 @@
       <input id="number-overtones-input" type="hidden">
 
     </div>
-    <div class="slider vertical" data-slider data-initial-start="0" data-end="100" data-vertical="true">
-      <span class="slider-handle" data-slider-handle role="slider" tabindex="1"></span>
-      <span class="slider-fill" data-slider-fill></span>
-      <input id="gain-control-13" type="hidden">
+    <br>
+    <div id="slider-container">
+      <div class="slider vertical" data-slider data-initial-start="70" data-end="100" data-vertical="true">
+        <span class="slider-handle" data-slider-handle role="slider" tabindex="1"></span>
+        <span class="slider-fill" data-slider-fill></span>
+        <input id="gain-control-0" type="hidden">
+      </div>
     </div>
     <script src="bower_components/jquery/dist/jquery.js"></script>
     <script src="bower_components/what-input/what-input.js"></script>
