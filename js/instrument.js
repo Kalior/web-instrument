@@ -4,6 +4,7 @@ $(document).ready(function () {
   try {
     window.AudioContext = window.AudioContext||window.webkitAudioContext;
     context = new webkitAudioContext();
+    addSliders();
   }
   catch(e) {
     alert(e);
