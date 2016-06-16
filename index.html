@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="css/app.css">
   </head>
   <body>
-    <button type="button" id="play-sound" class="button">Play</button><br>
 
     <div class="slider vertical" data-slider data-initial-start="70" data-end="100" data-vertical="true">
       <span class="slider-handle" data-slider-handle role="slider" tabindex="1"></span>
@@ -71,9 +70,13 @@
       <input id="gain-control-11" type="hidden">
     </div>
     <div class="slider vertical" data-slider data-initial-start="0" data-end="100" data-vertical="true">
+    <button type="button" id="play-sound" class="button">Play</button>
+    <br>
+    <div id="number-overtones-slider" class="slider" data-slider data-initial-start="10" data-end="25">
       <span class="slider-handle" data-slider-handle role="slider" tabindex="1"></span>
       <span class="slider-fill" data-slider-fill></span>
-      <input id="gain-control-12" type="hidden">
+      <input id="number-overtones-input" type="hidden">
+
     </div>
     <div class="slider vertical" data-slider data-initial-start="0" data-end="100" data-vertical="true">
       <span class="slider-handle" data-slider-handle role="slider" tabindex="1"></span>
