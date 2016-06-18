@@ -1,5 +1,11 @@
 var context;
 
+var numberOfBeats = 24;
+var numberOfTones = 12;
+
+var toneFreqs = [261.63, 277.18, 293.66, 311.13, 329.628, 349.23, 369.99, 391.995, 415.30, 440.00, 493.88, 466.16];
+var toneNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+
 $(document).ready(function () {
   try {
     window.AudioContext = window.AudioContext||window.webkitAudioContext;
@@ -13,17 +19,14 @@ $(document).ready(function () {
 });
 
 $("#play-sound").click(function () {
-  var tones = [261.63, 329.628, 391.995]
-  var melody = [200, 400, 100, 440, 220, 320]
-
-  // Setting tempo to 60 BPM just for now
+  // Setting tempo to 120 BPM just for now
   var tempo = 120.0;
   var secondsPerBeat = 60.0 / tempo;
 
-  for (var i = 0; i <= 7; i++) {
-    for (var j = 0; j < 3; j++) {
+  for (var i = 0; i < numberOfBeats; i++) {
+    for (var j = 0; j < numberOfTones; j++) {
       if ($("#melody-row-" + j + "-column-" + i).is(":checked")) {
-        playSound(tones[j], context.currentTime + 0.25 * i * secondsPerBeat, 0.25 * secondsPerBeat);
+        playSound(toneFreqs[j], context.currentTime + 0.25 * i * secondsPerBeat, 0.25 * secondsPerBeat);
       }
     }
   }
@@ -45,9 +48,11 @@ function round (value, decimals) {
 }
 
 function addTones() {
-  for (var i = 0; i < 3; i++) {
+  for (var i = 0; i < numberOfTones; i++) {
     var $tr = $('<tr class="melody-row" id="melody-row-' + i +'"></tr>');
-    for (var j = 0; j <= 7; j++) {
+    var $toneLabel = $('<td><b>' + toneNames[i] + '</b></td>')
+    $tr.append($toneLabel);
+    for (var j = 0; j < numberOfBeats; j++) {
       var $td =
         $('<td class="melody-cell">' +
           '<label for="melody-row-' + i + '-column-'+ j +'" class="melody-label"></label>' +
