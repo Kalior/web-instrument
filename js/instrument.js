@@ -46,9 +46,14 @@ function round (value, decimals) {
 
 function addTones() {
   for (var i = 0; i < 3; i++) {
-    var $tr = $('<tr id="melody-row-' + i +'"></tr>');
+    var $tr = $('<tr class="melody-row" id="melody-row-' + i +'"></tr>');
     for (var j = 0; j <= 7; j++) {
-      var $td = $('<td><input id="melody-row-' + i + '-column-'+ j +'" type="checkbox"></td>');
+      var $td =
+        $('<td class="melody-cell">' +
+          '<label for="melody-row-' + i + '-column-'+ j +'" class="melody-label"></label>' +
+          '<input class="melody-checkbox" id="melody-row-' + i + '-column-'+ j +'" type="checkbox">' +
+          '<div class="melody-box"></div>' +
+        '</td>');
       $tr.append($td);
     }
     $("#melody-table-body").append($tr);
