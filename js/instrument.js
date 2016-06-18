@@ -1,10 +1,10 @@
 var context;
 
-var numberOfBeats = 24;
+var numberOfBeats = 16*4;
 var numberOfTones = 12;
 
-var toneFreqs = [261.63, 277.18, 293.66, 311.13, 329.628, 349.23, 369.99, 391.995, 415.30, 440.00, 493.88, 466.16];
-var toneNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+var toneFreqs = [ 466.16, 493.88, 440.00, 415.30, 391.995, 369.99, 349.23, 329.628, 311.13, 293.66, 277.18, 261.63];
+var toneNames = ["B", "A#", "A", "G#", "G", "F#", "F", "E", "D#", "D", "C#", "C"];
 
 $(document).ready(function () {
   try {
