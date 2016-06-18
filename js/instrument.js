@@ -5,6 +5,7 @@ $(document).ready(function () {
     window.AudioContext = window.AudioContext||window.webkitAudioContext;
     context = new webkitAudioContext();
     addSliders();
+    addTones();
   }
   catch(e) {
     alert(e);
@@ -27,6 +28,13 @@ function round (value, decimals) {
     return Number(Math.round(value+'e'+decimals)+'e-'+decimals);
 }
 
+function addTones() {
+  for (var i = 0; i < 3; i++) {
+    var $tr = $('<tr id="melody-row-' + i +'"></tr>');
+    for (var j = 0; j <= 7; j++) {
+      var $td = $('<td><input id="melody-row-' + i + '-column-'+ j +'" type="checkbox"></td>');
+      $tr.append($td);
     }
+    $("#melody-table-body").append($tr);
   }
 }
