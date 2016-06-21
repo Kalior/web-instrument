@@ -1,10 +1,17 @@
 var context;
 
+var numberOfBeats = 16*4;
+var numberOfTones = 12;
+
+var toneFreqs = [ 466.16, 493.88, 440.00, 415.30, 391.995, 369.99, 349.23, 329.628, 311.13, 293.66, 277.18, 261.63];
+var toneNames = ["B", "A#", "A", "G#", "G", "F#", "F", "E", "D#", "D", "C#", "C"];
+
 $(document).ready(function () {
   try {
     window.AudioContext = window.AudioContext||window.webkitAudioContext;
     context = new webkitAudioContext();
     addSliders();
+    addTones();
   }
   catch(e) {
     alert(e);
@@ -12,61 +19,48 @@ $(document).ready(function () {
 });
 
 $("#play-sound").click(function () {
-  gainSum = 0;
+  // Setting tempo to 120 BPM just for now
+  var tempo = 120.0;
+  var secondsPerBeat = 60.0 / tempo;
+
+  for (var i = 0; i < numberOfBeats; i++) {
+    for (var j = 0; j < numberOfTones; j++) {
+      if ($("#melody-row-" + j + "-column-" + i).is(":checked")) {
+        playSound(toneFreqs[j], context.currentTime + 0.25 * i * secondsPerBeat, 0.25 * secondsPerBeat);
+      }
+    }
+  }
+});
+
+function playSound (freq, time, length) {
+  var gainSum = 0;
   for (var i = 0; i <= $("#number-overtones-input").val(); i++) {
     gainSum += $("#gain-control-" + i).val() / 100;
   }
 
   for (var i = 0; i <= $("#number-overtones-input").val(); i++) {
-    createOscilator(100 * (i+1), $("#gain-control-" + i).val() / (100 * gainSum));
+    createOscilator(freq * (i+1), $("#gain-control-" + i).val() / (100 * gainSum), time, length);
   }
-});
-
-function createOscilator (freq, gain) {
-  oscillator = context.createOscillator();
-  oscillator.frequency.value = freq;
-
-  gainNode = context.createGain();
-  oscillator.connect(gainNode)
-  gainNode.gain.value = gain;
-  gainNode.connect(context.destination);
-  oscillator.start(context.currentTime);
-  oscillator.stop(context.currentTime + 1);
 }
 
 function round (value, decimals) {
     return Number(Math.round(value+'e'+decimals)+'e-'+decimals);
 }
 
-$('#number-overtones-slider').on('changed.zf.slider', function(){
-  addSliders();
-  removeSliders();
-});
-
-function addSliders() {
-  for (var i = 0; i <= $("#number-overtones-input").val(); i++) {
-    if (!$("#gain-control-" + i).length) {
-      $div = newSlider(i);
-      $("#slider-container").append($div);
-      new Foundation.Slider($div, {});
+function addTones() {
+  for (var i = 0; i < numberOfTones; i++) {
+    var $tr = $('<tr class="melody-row" id="melody-row-' + i +'"></tr>');
+    var $toneLabel = $('<td><b>' + toneNames[i] + '</b></td>')
+    $tr.append($toneLabel);
+    for (var j = 0; j < numberOfBeats; j++) {
+      var $td =
+        $('<td class="melody-cell">' +
+          '<label for="melody-row-' + i + '-column-'+ j +'" class="melody-label"></label>' +
+          '<input class="melody-checkbox" id="melody-row-' + i + '-column-'+ j +'" type="checkbox">' +
+          '<div class="melody-box"></div>' +
+        '</td>');
+      $tr.append($td);
     }
-  }
-}
-
-function newSlider(i) {
-  var $div = $('<div class="slider vertical" data-slider data-initial-start="0" data-end="100" data-vertical="true"></div>');
-  var $span1 = $('<span class="slider-handle" data-slider-handle role="slider" tabindex="1"></span>');
-  var $span2 = $('<span class="slider-fill" data-slider-fill></span>');
-  var $input = $('<input id="gain-control-' + i + '" type="hidden">');
-  return $div.append($span1, $span2, $input);
-}
-
-function removeSliders() {
-  // 25 is magical number right now, upper limit of the slider that
-  // controls the amount of overtones
-  for (var i = 25; i > $("#number-overtones-input").val(); i--) {
-    if ($("#gain-control-" + i).length) {
-      $("#gain-control-" + i).parent().remove();
-    }
+    $("#melody-table-body").append($tr);
   }
 }

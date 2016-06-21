@@ -1,0 +1,26 @@
+.melody-checkbox {
+   position: absolute;
+   top: -9999px;
+   left: -9999px;
+}
+
+.melody-checkbox:checked ~ div {
+  background: #43AC6A;
+}
+
+.melody-box, .melody-label {
+  height:20px;
+  width: 20px;
+}
+
+.melody-label {
+  position: absolute;
+}
+
+.melody-cell {
+  padding: 0px;
+}
+
+.melody-row td {
+  padding: 0px;
+}
