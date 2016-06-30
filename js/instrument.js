@@ -12,6 +12,7 @@ $(document).ready(function () {
     context = new webkitAudioContext();
     addSliders();
     addTones();
+    drawEnvelope();
   }
   catch(e) {
     alert(e);
@@ -33,34 +34,23 @@ $("#play-sound").click(function () {
 });
 
 function playSound (freq, time, length) {
+  var envelopeAttack = length * $("#envelope-attack-input").val() / 100;
+  var envelopeDecay = length * $("#envelope-decay-input").val() / 100;
+  var envelopeRelease = length * $("#envelope-release-input").val() / 100;
+  var envelopeSustainTime = length - envelopeAttack - envelopeDecay - envelopeRelease;
+  var envelopeSustainGain = $("#envelope-sustain-input").val() / 100;
+
   var gainSum = 0;
   for (var i = 0; i <= $("#number-overtones-input").val(); i++) {
     gainSum += $("#gain-control-" + i).val() / 100;
   }
 
   for (var i = 0; i <= $("#number-overtones-input").val(); i++) {
-    createOscilator(freq * (i+1), $("#gain-control-" + i).val() / (100 * gainSum), time, length);
+    createOscilator(freq * (i+1), $("#gain-control-" + i).val() / (100 * gainSum), time,
+      length, envelopeAttack, envelopeDecay, envelopeSustainTime, envelopeRelease, envelopeSustainGain);
   }
 }
 
 function round (value, decimals) {
     return Number(Math.round(value+'e'+decimals)+'e-'+decimals);
-}
-
-function addTones() {
-  for (var i = 0; i < numberOfTones; i++) {
-    var $tr = $('<tr class="melody-row" id="melody-row-' + i +'"></tr>');
-    var $toneLabel = $('<td><b>' + toneNames[i] + '</b></td>')
-    $tr.append($toneLabel);
-    for (var j = 0; j < numberOfBeats; j++) {
-      var $td =
-        $('<td class="melody-cell">' +
-          '<label for="melody-row-' + i + '-column-'+ j +'" class="melody-label"></label>' +
-          '<input class="melody-checkbox" id="melody-row-' + i + '-column-'+ j +'" type="checkbox">' +
-          '<div class="melody-box"></div>' +
-        '</td>');
-      $tr.append($td);
-    }
-    $("#melody-table-body").append($tr);
-  }
 }
