@@ -12,6 +12,7 @@ $(document).ready(function () {
     context = new webkitAudioContext();
     addSliders();
     addTones();
+    drawEnvelope();
   }
   catch(e) {
     alert(e);
