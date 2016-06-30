@@ -6,6 +6,8 @@ var numberOfTones = 12;
 var toneFreqs = [493.88, 466.16, 440.00, 415.30, 391.995, 369.99, 349.23, 329.628, 311.13, 293.66, 277.18, 261.63];
 var toneNames = ["B", "A#", "A", "G#", "G", "F#", "F", "E", "D#", "D", "C#", "C"];
 
+var timer;
+
 $(document).ready(function () {
   try {
     window.AudioContext = window.AudioContext||window.webkitAudioContext;
@@ -23,7 +25,20 @@ $("#play-sound").click(function () {
   // Setting tempo to 120 BPM just for now
   var tempo = 120.0;
   var secondsPerBeat = 60.0 / tempo;
+  if (timer == null) {
+    playMelody(secondsPerBeat);
+    timer = setInterval(function() { playMelody(secondsPerBeat) }, 0.25 * secondsPerBeat * numberOfBeats * 1000);
+  }
+});
 
+$("#stop-sound").click(function () {
+  if (timer != null) {
+    clearInterval(timer);
+    timer = null;
+  }
+});
+
+function playMelody (secondsPerBeat) {
   for (var i = 0; i < numberOfBeats; i++) {
     for (var j = 0; j < numberOfTones; j++) {
       if (isToneWithIndexChecked(i,j) && !isToneWithIndexChecked(i-1,j)) {
@@ -31,7 +46,7 @@ $("#play-sound").click(function () {
       }
     }
   }
-});
+}
 
 function playSound (freq, startTime, length) {
   var envelopeAttack = length * $("#envelope-attack-input").val() / 100;
