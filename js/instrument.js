@@ -26,8 +26,8 @@ $("#play-sound").click(function () {
 
   for (var i = 0; i < numberOfBeats; i++) {
     for (var j = 0; j < numberOfTones; j++) {
-      if ($("#melody-row-" + j + "-column-" + i).is(":checked")) {
-        playSound(toneFreqs[j], context.currentTime + 0.25 * i * secondsPerBeat, 0.25 * secondsPerBeat);
+      if (isToneWithIndexChecked(i,j) && !isToneWithIndexChecked(i-1,j)) {
+        playSound(toneFreqs[j], context.currentTime + 0.25 * i * secondsPerBeat, 0.25 * secondsPerBeat * toneLength(i, j));
       }
     }
   }

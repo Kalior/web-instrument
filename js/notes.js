@@ -15,3 +15,15 @@ function addTones() {
     $("#melody-table-body").append($tr);
   }
 }
+
+function toneLength (column, row) {
+  if (isToneWithIndexChecked(column,row)) {
+    return 1 + toneLength(column+1, row);
+  } else {
+    return 0;
+  }
+}
+
+function isToneWithIndexChecked(column, row) {
+  return $("#melody-row-" + row + "-column-" + column).is(":checked")
+}
