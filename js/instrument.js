@@ -33,7 +33,7 @@ $("#play-sound").click(function () {
   }
 });
 
-function playSound (freq, time, length) {
+function playSound (freq, startTime, length) {
   var envelopeAttack = length * $("#envelope-attack-input").val() / 100;
   var envelopeDecay = length * $("#envelope-decay-input").val() / 100;
   var envelopeRelease = length * $("#envelope-release-input").val() / 100;
@@ -46,7 +46,7 @@ function playSound (freq, time, length) {
   }
 
   for (var i = 0; i <= $("#number-overtones-input").val(); i++) {
-    createOscilator(freq * (i+1), $("#gain-control-" + i).val() / (100 * gainSum), time,
+    createOscilator(freq * (i+1), $("#gain-control-" + i).val() / (100 * gainSum), startTime,
       length, envelopeAttack, envelopeDecay, envelopeSustainTime, envelopeRelease, envelopeSustainGain);
   }
 }
