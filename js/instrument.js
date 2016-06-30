@@ -34,10 +34,10 @@ $("#play-sound").click(function () {
 });
 
 function playSound (freq, time, length) {
-  var envelopeAttack = $("#envelope-attack-input").val() / 100;
-  var envelopeDecay = $("#envelope-decay-input").val() / 100;
-  var envelopeRelease = $("#envelope-release-input").val() / 100;
-  var envelopeSustainTime = 1 - envelopeAttack - envelopeDecay - envelopeRelease;
+  var envelopeAttack = length * $("#envelope-attack-input").val() / 100;
+  var envelopeDecay = length * $("#envelope-decay-input").val() / 100;
+  var envelopeRelease = length * $("#envelope-release-input").val() / 100;
+  var envelopeSustainTime = length - envelopeAttack - envelopeDecay - envelopeRelease;
   var envelopeSustainGain = $("#envelope-sustain-input").val() / 100;
 
   var gainSum = 0;
@@ -45,14 +45,9 @@ function playSound (freq, time, length) {
     gainSum += $("#gain-control-" + i).val() / 100;
   }
 
-  var attack = length * envelopeAttack;
-  var decay = length * envelopeDecay;
-  var sustainTime = length * envelopeSustainTime;
-  var release = length * envelopeRelease;
-
   for (var i = 0; i <= $("#number-overtones-input").val(); i++) {
     createOscilator(freq * (i+1), $("#gain-control-" + i).val() / (100 * gainSum), time,
-      length, attack, decay, sustainTime, release, envelopeSustainGain);
+      length, envelopeAttack, envelopeDecay, envelopeSustainTime, envelopeRelease, envelopeSustainGain);
   }
 }
 
