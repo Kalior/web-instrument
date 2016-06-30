@@ -16,14 +16,14 @@ function addTones() {
   }
 }
 
-function toneLength (i, j) {
-  if (isToneWithIndexChecked(i,j)) {
-    return 1 + toneLength(i+1, j);
+function toneLength (column, row) {
+  if (isToneWithIndexChecked(column,row)) {
+    return 1 + toneLength(column+1, row);
   } else {
     return 0;
   }
 }
 
-function isToneWithIndexChecked(i, j) {
-  return $("#melody-row-" + j + "-column-" + i).is(":checked")
+function isToneWithIndexChecked(column, row) {
+  return $("#melody-row-" + row + "-column-" + column).is(":checked")
 }
