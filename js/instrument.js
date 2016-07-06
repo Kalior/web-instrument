@@ -25,14 +25,14 @@ $("#play-sound").click(function () {
   // Setting tempo to 120 BPM just for now
   var tempo = 120.0;
   var secondsPerBeat = 60.0 / tempo;
-  if (timer == null) {
+  if (!timer) {
     playMelody(secondsPerBeat);
     timer = setInterval(function() { playMelody(secondsPerBeat) }, 0.25 * secondsPerBeat * numberOfBeats * 1000);
   }
 });
 
 $("#stop-sound").click(function () {
-  if (timer != null) {
+  if (timer) {
     clearInterval(timer);
     timer = null;
   }
