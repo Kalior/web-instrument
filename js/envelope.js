@@ -11,7 +11,7 @@ function drawEnvelope() {
   var envelopeSustainTime  = canvas.width - envelopeAttack - envelopeDecay - envelopeRelease;
 
   context.beginPath();
-  context.moveTo(0, 200);
+  context.moveTo(0, canvas.height);
   context.lineTo(envelopeAttack, 0);
   context.strokeStyle = "#2199e8";
   context.stroke();

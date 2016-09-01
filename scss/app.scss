@@ -49,3 +49,27 @@
 
 @include motion-ui-transitions;
 @include motion-ui-animations;
+
+body {
+  font-family: "Lucida Console";
+  background-color: #E4EFE4;
+  color: #666;
+}
+
+.top-bar {
+  border-radius:    3px;
+  background-color: #fff;
+  margin-bottom:    30px;
+  padding:          10px;
+  border-color:     #cdc;
+  border-width:     1px;
+  border-style:     solid;
+}
+
+li {
+  background-color: #fff;
+}
+
+.column:last-child:not(:first-child), .columns:last-child:not(:first-child) {
+  float: none;
+}
