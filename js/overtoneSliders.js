@@ -1,32 +1,65 @@
-$('#number-overtones-slider').on('changed.zf.slider', function(){
-  addSliders();
-  removeSliders();
+import React from 'react';
+import Rcslider from 'rc-slider';
+
+export default class OverToneSlidersContainer extends React.Component {
+  constructor(props) {
+    super(props);
+    var initialOvertoneGainArray = [];
+    for (var i = 0; i <= 25; i++) {
+      initialOvertoneGainArray[i] = 0;
+    }
+    initialOvertoneGainArray[0] = 70;
+    this.state = {amountOfOvertones: 10, overtoneGainArray: initialOvertoneGainArray};
+    this.onOvertoneAmountChange = this.onOvertoneAmountChange.bind(this);
+    this.onGainChange = this.onGainChange.bind(this);
+  }
+  onOvertoneAmountChange(value) {
+    this.setState({amountOfOvertones: value});
+    this.props.onOvertoneAmountChange(value);
+  }
+  onGainChange(overtoneIndex, gain) {
+    var newOvertoneGainArray = this.state.overtoneGainArray;
+    newOvertoneGainArray[overtoneIndex] = gain;
+    this.setState({overtoneGainArray: newOvertoneGainArray});
+    this.props.onOvertoneArrayChange(newOvertoneGainArray);
+  }
+  componentDidMount() {
+    this.props.onOvertoneArrayChange(this.state.overtoneGainArray);
+    this.props.onOvertoneAmountChange(this.state.amountOfOvertones);
+  }
+  render() {
+    var overtoneSliders = [];
+    for (var i = 0; i < this.state.amountOfOvertones; i++) {
+      overtoneSliders.push(
+        <Rcslider id={'gain-control-' + i}
+          min={0} max={100} defaultValue={this.state.overtoneGainArray[i]} onAfterChange={this.onAmountChange} key={i} onAfterChange={this.onGainChange.bind(this, i)}/>);
+    }
+    return(
+      <div className="OvertToneSlidersContainer container column small-centered small-8">
+        <b>Amount of overtones</b>
+        <OverTonesAmountSlider onOvertoneChange={this.onOvertoneAmountChange}/>
+        <b>Overtones</b>
+        {overtoneSliders}
+      </div>
+    );
+  }
+}
+
+var OverTonesAmountSlider = React.createClass({
+  getInitialState: function() {
+    return {amountOfOvertones: 10};
+  },
+  componentDidMount: function() {
+
+  },
+  onAmountChange: function(value) {
+    this.setState({amountOfOvertones: value});
+    this.props.onOvertoneChange(value);
+  },
+  render: function() {
+    return(
+      <Rcslider className="OverTonesAmountSlider" id="number-overtones-slider"
+        min={0} max={25} defaultValue={this.state.amountOfOvertones} onAfterChange={this.onAmountChange}/>
+    );
+  }
 });
-
-function addSliders() {
-  for (var i = 0; i <= $("#number-overtones-input").val(); i++) {
-    if (!$("#gain-control-" + i).length) {
-      $div = newSlider(i);
-      $("#slider-container").append($div);
-      new Foundation.Slider($div, {});
-    }
-  }
-}
-
-function newSlider(i) {
-  var $div = $('<div class="slider vertical" data-slider data-initial-start="0" data-end="100" data-vertical="true"></div>');
-  var $span1 = $('<span class="slider-handle" data-slider-handle role="slider" tabindex="1"></span>');
-  var $span2 = $('<span class="slider-fill" data-slider-fill></span>');
-  var $input = $('<input id="gain-control-' + i + '" type="hidden">');
-  return $div.append($span1, $span2, $input);
-}
-
-function removeSliders() {
-  // 25 is magical number right now, upper limit of the slider that
-  // controls the amount of overtones
-  for (var i = 25; i > $("#number-overtones-input").val(); i--) {
-    if ($("#gain-control-" + i).length) {
-      $("#gain-control-" + i).parent().remove();
-    }
-  }
-}

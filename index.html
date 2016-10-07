@@ -29,63 +29,7 @@
       </div>
     </div>
     <div id="wrapper">
-      <div id="content" class="row">
-        <div class="container column small-centered small-8">
-          <b>Amount of overtones</b><br>
-          <div id="number-overtones-slider" class="slider" data-slider data-initial-start="13" data-end="25">
-            <span class="slider-handle" data-slider-handle role="slider" tabindex="1"></span>
-            <span class="slider-fill" data-slider-fill></span>
-            <input id="number-overtones-input" type="hidden">
-          </div>
-          <b>Overtones</b>
-          <div id="slider-container">
-            <div class="slider vertical" data-slider data-initial-start="70" data-end="100" data-vertical="true">
-              <span class="slider-handle" data-slider-handle role="slider" tabindex="1"></span>
-              <span class="slider-fill" data-slider-fill></span>
-              <input id="gain-control-0" type="hidden">
-            </div>
-          </div>
-        </div>
-        <div class="container column small-centered small-8">
-          <b>Melody</b>
-          <div class="table-scroll" id="melody-container">
-            <table>
-              <tbody id="melody-table-body">
-              </tbody>
-            </table>
-          </div>
-        </div>
-        <div class="container column small-centered small-8 last-element">
-          <b>Envelope</b>
-          <div id="envelope-container">
-            <canvas id="envelope-graph" width=400></canvas> <br>
-            <b>Attack</b>
-            <div class="slider envelope-slider primary" data-slider data-initial-start="10" data-end="100">
-              <span class="slider-handle" data-slider-handle role="slider" tabindex="1"></span>
-              <span class="slider-fill" data-slider-fill></span>
-              <input id="envelope-attack-input" type="hidden">
-            </div>
-            <b>Decay</b>
-            <div class="slider envelope-slider" data-slider data-initial-start="20" data-end="100">
-              <span class="slider-handle success" data-slider-handle role="slider" tabindex="1"></span>
-              <span class="slider-fill" data-slider-fill></span>
-              <input id="envelope-decay-input" type="hidden">
-            </div>
-            <b>Sustain</b>
-            <div class="slider envelope-slider" data-slider data-initial-start="50" data-end="100">
-              <span class="slider-handle secondary" data-slider-handle role="slider" tabindex="1"></span>
-              <span class="slider-fill" data-slider-fill></span>
-              <input id="envelope-sustain-input" type="hidden">
-            </div>
-            <b>Release</b>
-            <div class="slider envelope-slider" data-slider data-initial-start="30" data-end="100">
-              <span class="slider-handle alert" data-slider-handle role="slider" tabindex="1"></span>
-              <span class="slider-fill" data-slider-fill></span>
-              <input id="envelope-release-input" type="hidden">
-            </div>
-          </div>
-        </div>
-      </div>
+      <div id="react-web-instrument"></div>
     </div>
     <div id='footer'>
         <div class='larger'>Created by <b>Joel Gustafsson</b> | <a href='https://joelgustafsson.com'>My webpage</a> | <a href="#top">To the top</a> </div>
@@ -96,10 +40,6 @@
     <script src="bower_components/what-input/what-input.js"></script>
     <script src="bower_components/foundation-sites/dist/foundation.js"></script>
     <script src="js/app.js"></script>
-    <script src="js/instrument.js"></script>
-    <script src="js/overtoneSliders.js"></script>
-    <script src="js/oscilator.js"></script>
-    <script src="js/notes.js"></script>
-    <script src="js/envelope.js"></script>
+    <script src="js/bundle.js"></script>
   </body>
 </html>

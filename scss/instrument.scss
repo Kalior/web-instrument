@@ -56,6 +56,7 @@ html {
   border-color:     #cdc;
   border-width:     1px;
   border-style:     solid;
+  width:            100%;
 }
 
 .button-container {
@@ -100,4 +101,9 @@ html {
 .larger {
   display: inline;
   font-size: 20px;
+}
+
+.rc-slider {
+  margin: 10px;
+  padding-right: 10px;
 }
