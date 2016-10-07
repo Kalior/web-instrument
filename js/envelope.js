@@ -1,13 +1,16 @@
-function drawEnvelope() {
+import React from 'react';
+import Rcslider from 'rc-slider';
+
+function drawEnvelope(attack, decay, release, sustainGain) {
   var canvas = document.getElementById("envelope-graph");
   var context = canvas.getContext("2d");
   context.clearRect(0, 0, canvas.width, canvas.height);
   context.lineWidth = "2";
 
-  var envelopeAttack       = canvas.width * (parseInt($("#envelope-attack-input").val()) / 100);
-  var envelopeDecay        = canvas.width * (parseInt($("#envelope-decay-input").val()) / 100);
-  var envelopeRelease      = canvas.width * (parseInt($("#envelope-release-input").val()) / 100);
-  var envelopeSustainGain  = canvas.height * (1 - parseInt($("#envelope-sustain-input").val()) / 100);
+  var envelopeAttack       = canvas.width * attack / 100;
+  var envelopeDecay        = canvas.width * decay / 100;
+  var envelopeRelease      = canvas.width * release / 100;
+  var envelopeSustainGain  = canvas.height * (1 - sustainGain / 100);
   var envelopeSustainTime  = canvas.width - envelopeAttack - envelopeDecay - envelopeRelease;
 
   context.beginPath();
@@ -48,3 +51,61 @@ function drawSetTargetAtTime (context, timeBefore, length, V0, V1, timeConstant,
 $('.envelope-slider').on('moved.zf.slider', function(){
   drawEnvelope();
 });
+
+
+export default class EnvelopeContainer extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {attack: 10, decay: 20, sustain: 50, release: 30};
+    this.handleAttackChange = this.handleAttackChange.bind(this);
+    this.handleDecayChange = this.handleDecayChange.bind(this);
+    this.handleSustainChange = this.handleSustainChange.bind(this);
+    this.handleReleaseChange = this.handleReleaseChange.bind(this);
+  }
+  handleAttackChange(newAttack) {
+    this.setState({attack: newAttack});
+    drawEnvelope(this.state.attack, this.state.decay, this.state.release, this.state.sustain);
+    this.props.onAttackChange(newAttack);
+  }
+  handleDecayChange(newDecay) {
+    this.setState({decay: newDecay});
+    drawEnvelope(this.state.attack, this.state.decay, this.state.release, this.state.sustain);
+    this.props.onDecayChange(newDecay);
+  }
+  handleSustainChange(newSustain) {
+    this.setState({sustain: newSustain});
+    drawEnvelope(this.state.attack, this.state.decay, this.state.release, this.state.sustain);
+    this.props.onSustainChange(newSustain);
+  }
+  handleReleaseChange(newRelease) {
+    this.setState({release: newRelease});
+    drawEnvelope(this.state.attack, this.state.decay, this.state.release, this.state.sustain);
+    this.props.onReleaseChange(newRelease);
+  }
+  componentDidMount() {
+    drawEnvelope(this.state.attack, this.state.decay, this.state.release, this.state.sustain);
+  }
+  render() {
+    return(
+      <div className="container column small-centered small-8 last-element">
+        <b>Envelope</b>
+        <div id="envelope-container">
+          <canvas id="envelope-graph" height={200} width={800}/>
+          <br></br>
+          <b>Attack</b>
+          <Rcslider id={'attack-envelope-input'} defaultValue={this.state.attack}
+            min={0} max={100} onChange={this.handleAttackChange} />
+          <b>Decay</b>
+          <Rcslider id={'envelope-decay-input'} defaultValue={this.state.decay}
+            min={0} max={100} onChange={this.handleDecayChange} />
+          <b>Release</b>
+          <Rcslider id={'envelope-release-input'} defaultValue={this.state.release}
+            min={0} max={100} onChange={this.handleReleaseChange} />
+          <b>Sustain</b>
+          <Rcslider id={'envelope-sustain-input'} defaultValue={this.state.sustain}
+            min={0} max={100} onChange={this.handleSustainChange} />
+        </div>
+      </div>
+    );
+  }
+}
