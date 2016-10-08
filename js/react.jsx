@@ -18,7 +18,20 @@ var globalAttack, globalDecay, globalSustain, globalRelease, globalOvertonesAmou
 class WebInstrument extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {notesGrid: [], overtonesAmount: 10, overtonesArray: [], attack: 10, decay: 20, sustain: 50, release: 30};
+    var initialOvertoneGainArray = [];
+    for (var i = 0; i <= 25; i++) {
+      initialOvertoneGainArray[i] = 0;
+    }
+    initialOvertoneGainArray[0] = 70;
+
+    var initialNotesGrid = [];
+    for (var i = 0; i <= 16; i++) {
+      initialNotesGrid[i] = [];
+      for (var j = 0; j <= 12; j++) {
+        initialNotesGrid[i][j] = false;
+      }
+    }
+    this.state = {notesGrid: initialNotesGrid, overtonesAmount: 10, overtonesArray: initialOvertoneGainArray, attack: 10, decay: 20, sustain: 50, release: 30};
     this.handePianoRollChange = this.handePianoRollChange.bind(this);
     this.handleAttackChange = this.handleAttackChange.bind(this);
     this.handleDecayChange = this.handleDecayChange.bind(this);
@@ -67,8 +80,9 @@ class WebInstrument extends React.Component {
   render() {
     return (
       <div className="WebInstrument row" id="content">
-          <PianoRollContainer onPianoRollChange={this.handePianoRollChange} />
-          <OverToneSlidersContainer onOvertoneAmountChange={this.handleOvertoneAmountChange} onOvertoneArrayChange={this.handleOvertoneArrayChange}/>
+          <PianoRollContainer onPianoRollChange={this.handePianoRollChange} initialNotesGrid={this.state.notesGrid}/>
+          <OverToneSlidersContainer onOvertoneAmountChange={this.handleOvertoneAmountChange} onOvertoneArrayChange={this.handleOvertoneArrayChange}
+            initalOvertonesAmount={this.state.overtonesAmount} initialOvertoneGainArray={this.state.overtonesArray}/>
           <EnvelopeContainer onAttackChange={this.handleAttackChange} onDecayChange={this.handleDecayChange}
             onReleaseChange={this.handleReleaseChange} onSustainChange={this.handleSustainChange}/>
       </div>
@@ -123,8 +137,6 @@ function playSound (freq, startTime, length) {
   var envelopeRelease = length * globalRelease / 100;
   var envelopeSustainTime = length - envelopeAttack - envelopeDecay - envelopeRelease;
   var envelopeSustainGain = globalSustain / 100;
-
-  console.log(length);
 
   var gainSum = 0;
   for (var i = 0; i <= globalOvertonesAmount; i++) {

@@ -5,14 +5,7 @@ var pianoRollCellSize = 30;
 export default class PianoRollContainer extends React.Component {
   constructor(props) {
     super(props);
-    var initialNotesGrid = [];
-    for (var i = 0; i <= 12; i++) {
-      initialNotesGrid[i] = [];
-      for (var j = 0; j <= 16; j++) {
-        initialNotesGrid[i][j] = false;
-      }
-    }
-    this.state = {notesGrid: initialNotesGrid};
+    this.state = {notesGrid: this.props.initialNotesGrid, mouseDownCanvas: false, adding: false};
     this.handleCellClicked = this.handleCellClicked.bind(this);
     this.initializeCanvasEvents = this.initializeCanvasEvents.bind(this);
     this.handleMouseMove = this.handleMouseMove.bind(this);
@@ -22,7 +15,6 @@ export default class PianoRollContainer extends React.Component {
     this.handleMouseClick = this.handleMouseClick.bind(this);
   }
   componentDidMount() {
-    this.props.onPianoRollChange(this.state.notesGrid);
     this.initializeCanvasEvents();
     this.drawCanvas();
   }
