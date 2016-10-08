@@ -1,5 +1,5 @@
 import React from 'react';
-import Rcslider from 'rc-slider';
+import Rcslider from 'rc-slider-colored';
 
 function drawEnvelope(attack, decay, release, sustainGain) {
   var canvas = document.getElementById("envelope-graph");
@@ -94,16 +94,16 @@ export default class EnvelopeContainer extends React.Component {
           <br></br>
           <b>Attack</b>
           <Rcslider id={'attack-envelope-input'} defaultValue={this.state.attack}
-            min={0} max={100} onChange={this.handleAttackChange} />
+            min={0} max={100} onChange={this.handleAttackChange}  marks={{0: {color: '#2199e8'}}}/>
           <b>Decay</b>
           <Rcslider id={'envelope-decay-input'} defaultValue={this.state.decay}
-            min={0} max={100} onChange={this.handleDecayChange} />
-          <b>Release</b>
-          <Rcslider id={'envelope-release-input'} defaultValue={this.state.release}
-            min={0} max={100} onChange={this.handleReleaseChange} />
+            min={1} max={100} onChange={this.handleDecayChange} marks={{1: {color: '#3adb76'}}}/>
           <b>Sustain</b>
           <Rcslider id={'envelope-sustain-input'} defaultValue={this.state.sustain}
-            min={0} max={100} onChange={this.handleSustainChange} />
+            min={0} max={100} onChange={this.handleSustainChange} marks={{0: {color: '#777777'}}}/>
+          <b>Release</b>
+          <Rcslider id={'envelope-release-input'} defaultValue={this.state.release}
+            min={0} max={100} onChange={this.handleReleaseChange} marks={{0: {color: '#ec5840'}}}/>
         </div>
       </div>
     );
