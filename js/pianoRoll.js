@@ -1,5 +1,7 @@
 import React from 'react';
 
+var pianoRollCellSize = 30;
+
 export default class PianoRollContainer extends React.Component {
   constructor(props) {
     super(props);
@@ -12,9 +14,17 @@ export default class PianoRollContainer extends React.Component {
     }
     this.state = {notesGrid: initialNotesGrid};
     this.handleCellClicked = this.handleCellClicked.bind(this);
+    this.initializeCanvasEvents = this.initializeCanvasEvents.bind(this);
+    this.handleMouseMove = this.handleMouseMove.bind(this);
+    this.drawCanvas = this.drawCanvas.bind(this);
+    this.handleMouseUp = this.handleMouseUp.bind(this);
+    this.handleMouseDown = this.handleMouseDown.bind(this);
+    this.handleMouseClick = this.handleMouseClick.bind(this);
   }
   componentDidMount() {
     this.props.onPianoRollChange(this.state.notesGrid);
+    this.initializeCanvasEvents();
+    this.drawCanvas();
   }
   handleCellClicked(value, row, column) {
     var newNotesGrid = this.state.notesGrid;
@@ -22,69 +32,124 @@ export default class PianoRollContainer extends React.Component {
     this.setState({notesGrid: newNotesGrid});
     this.props.onPianoRollChange(newNotesGrid);
   }
+  handleMouseUp() {
+    this.setState({mouseDownCanvas: false});
+  }
+  handleMouseDown(event) {
+    var canvas = document.getElementById("piano-roll-canvas");
+    this.setState({mouseDownCanvas: true});
+    var mousePos = getMouseCoordinates(canvas, event);
+    if (!this.state.notesGrid[mousePos.row][mousePos.column]) {
+      this.setState({adding: true});
+    }
+    else {
+      this.setState({adding: false});
+    }
+  }
+  drawCanvas() {
+    // this should probably know about the grid.
+    var canvas = document.getElementById("piano-roll-canvas");
+    var context = canvas.getContext("2d");
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    context.beginPath();
+    for (var i = 0; i < 12; i++) {
+      for (var j = 0; j < 16; j++) {
+        roundRect(context, pianoRollCellSize*i, pianoRollCellSize*j, pianoRollCellSize, pianoRollCellSize, 5);
+        if (this.state.notesGrid[i][j]) {
+          context.fillStyle = 'rgb(58, 219, 118)';
+        }
+        else {
+          context.fillStyle = 'white';
+        }
+        context.fill();
+        context.lineWidth = 1;
+        context.strokeStyle = 'black';
+        context.stroke();
+      }
+    }
+  }
+  initializeCanvasEvents() {
+    var canvas = document.getElementById("piano-roll-canvas");
+    // Bunch of event handlers for when mouse is down, up, moves, and preventing selection.
+    canvas.addEventListener("mousemove", this.handleMouseMove, false);
+    canvas.addEventListener("mousedown", this.handleMouseDown, false);
+    canvas.addEventListener("mouseup", this.handleMouseUp, false);
+    canvas.addEventListener("mouseout", this.handleMouseUp, false);
+    canvas.addEventListener("click", this.handleMouseClick, false);
+    // do nothing in the event handler except canceling the event
+    canvas.ondragstart = function(e) {
+      if (e && e.preventDefault) { e.preventDefault(); }
+      if (e && e.stopPropagation) { e.stopPropagation(); }
+      return false;
+    }
+    // do nothing in the event handler except canceling the event
+    canvas.onselectstart = function(e) {
+      if (e && e.preventDefault) { e.preventDefault(); }
+      if (e && e.stopPropagation) { e.stopPropagation(); }
+      return false;
+    }
+  }
+  handleMouseMove(event) {
+    event.preventDefault();
+    if (this.state.mouseDownCanvas) {
+      var canvas = document.getElementById("piano-roll-canvas");
+      var mousePos = getMouseCoordinates(canvas, event);
+      if (!this.state.notesGrid[mousePos.row][mousePos.column] && this.state.adding) {
+        this.handleCellClicked(true, mousePos.row, mousePos.column);
+        this.drawCanvas();
+      }
+      else if (this.state.notesGrid[mousePos.row][mousePos.column] && !this.state.adding) {
+        this.handleCellClicked(false, mousePos.row, mousePos.column);
+        this.drawCanvas();
+      }
+    }
+  }
+  handleMouseClick(event) {
+    event.preventDefault();
+    var canvas = document.getElementById("piano-roll-canvas");
+    var mousePos = getMouseCoordinates(canvas, event);
+    if (!this.state.notesGrid[mousePos.row][mousePos.column] && this.state.adding) {
+      this.handleCellClicked(true, mousePos.row, mousePos.column);
+    }
+    else if (!this.state.adding) {
+      this.handleCellClicked(false, mousePos.row, mousePos.column);
+    }
+    this.drawCanvas();
+  }
   render() {
     var toneNames = ["B", "A#", "A", "G#", "G", "F#", "F", "E", "D#", "D", "C#", "C"];
     var isWhite = [true, false, true, false, true, false, true, true, false, true, false, true];
-    var pianoRows = [];
-    for (var i = 0; i < toneNames.length; i++) {
-      pianoRows.push(<PianoRollRow
-        key={i} row={i} cellAmount={16} white={isWhite[i]} note={toneNames[i]} onCellClicked={this.handleCellClicked}/>);
-    }
     return (
       <div className="PianoRollContainer container column small-centered small-8">
         <b>Melody</b>
-        {pianoRows}
+        <div>
+          <canvas id="piano-roll-canvas" width={12*pianoRollCellSize+4} height={16*pianoRollCellSize+4}/>
+          <br></br>
+          <b>B A# A G# G F# F E D# D C# C</b>
+        </div>
       </div>
     );
   }
 }
 
-var PianoRollRow = React.createClass({
-  render: function() {
-    var pianoCells = []
-    for (var i = 0; i < this.props.cellAmount; i++) {
-      pianoCells.push(React.createElement(PianoRollCell, {row: this.props.row, column: i, onCellClicked: this.props.onCellClicked, key: i}));
-    }
-    var containerStyle = {
-      display: 'flex',
-      alignItems: 'center'
-    }
-    var rowStyle = {
-      background: this.props.white ? '#f0f0f0' : '#666',
-      width: this.props.cellAmount*20 + 'px',
-      height: '20px'
-    }
-    return (
-      React.createElement('div', {className: "PianoRollRow", style: containerStyle},
-        React.createElement('b', {style: {display: 'inline', width: '20px'}}, this.props.note),
-        React.createElement('div', {style: rowStyle}, pianoCells)
-      )
-    );
-  }
-});
+ //integrate this in the react component later, will give access to state and such.
+function getMouseCoordinates(canvas, event) {
+  var rect = canvas.getBoundingClientRect();
+  return {row: Math.floor((event.clientX - rect.left) / pianoRollCellSize),
+          column: Math.floor((event.clientY - rect.top) / pianoRollCellSize)};
+}
 
-var PianoRollCell = React.createClass({
-  getInitialState: function() {
-    return {checked: false};
-  },
-  handleClick: function(e) {
-    e.preventDefault();
-    this.props.onCellClicked(!this.state.checked, this.props.row, this.props.column);
-    this.setState({checked: !this.state.checked});
-  },
-
-  render: function() {
-    var divStyle = {
-      background: this.state.checked ? '#3adb76' : '',
-      height: '20px',
-      width: '20px',
-      display: 'inline-block',
-      borderWidth: '1px',
-      borderStyle: 'solid',
-      borderColor: '#aaa'
-    }
-    return (
-      React.createElement('div', {className: "PianoRollCell", onClick: this.handleClick, onDragEnter: this.handleClick, style: divStyle})
-    );
-  }
-});
+function roundRect(context, x, y, w, h, r) {
+  if (w < 2 * r) r = w / 2;
+  if (h < 2 * r) r = h / 2;
+  context.save();
+  context.translate(2, 2);
+  context.beginPath();
+  context.moveTo(x+r, y);
+  context.arcTo(x+w, y,   x+w, y+h, r);
+  context.arcTo(x+w, y+h, x,   y+h, r);
+  context.arcTo(x,   y+h, x,   y,   r);
+  context.arcTo(x,   y,   x+w, y,   r);
+  context.closePath();
+  context.restore();
+}
