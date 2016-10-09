@@ -149,8 +149,11 @@ function playSound (freq, startTime, length) {
   for (var i = 0; i <= globalOvertonesAmount; i++) {
     gainSum += globalOvertonesArray[i] / 100;
   }
+
+  var lfo = createLFO();
+
   for (var i = 0; i < globalOvertonesAmount; i++) {
-    createOscilator(freq * (i+1), globalOvertonesArray[i] / (100 * gainSum), startTime,
+    createOscilator(lfo, freq * (i+1), globalOvertonesArray[i] / (100 * gainSum), startTime,
       length, envelopeAttack, envelopeDecay, envelopeSustainTime, envelopeRelease, envelopeSustainGain);
   }
 }
@@ -188,4 +191,14 @@ function createOscilator (freq, gain, startTime, length, attack, decay, sustain,
   oscillator.connect(gainNode)
   oscillator.start(startTime);
   oscillator.stop(startTime + length);
+
+// A modulator have a oscillator and a gain
+function createLFO() {
+  var detuneOscillator = context.createOscillator();
+  var detuneGain = context.createGain();
+  detuneOscillator.frequency.value = globalLFOFrequency;
+  detuneGain.gain.value = globalLFOAmplitude;
+  detuneOscillator.connect(detuneGain);
+  detuneOscillator.start(0);
+  return detuneGain;
 }
