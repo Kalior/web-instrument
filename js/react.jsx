@@ -13,10 +13,6 @@ var numberOfTones = 12;
 
 var toneFreqs = [493.88, 466.16, 440.00, 415.30, 391.995, 369.99, 349.23, 329.628, 311.13, 293.66, 277.18, 261.63];
 
-var globalNotesGrid = [];
-var globalOvertonesArray = [];
-var globalAttack, globalDecay, globalSustain, globalRelease, globalOvertonesAmount, globalLFOFrequency, globalLFOAmplitude;
-
 class WebInstrument extends React.Component {
   constructor(props) {
     super(props);
@@ -34,7 +30,8 @@ class WebInstrument extends React.Component {
       }
     }
     this.state = {notesGrid: initialNotesGrid, overtonesAmount: 10, overtonesArray: initialOvertoneGainArray,
-        attack: 10, decay: 20, sustain: 50, release: 30, detuneValue: 0, lfoFrequency: 5, lfoAmplitude: 2};
+        attack: 10, decay: 20, sustain: 50, release: 30, detuneValue: 0, lfoFrequency: 5, lfoAmplitude: 2,
+        context: null, timer: null};
     this.handePianoRollChange = this.handePianoRollChange.bind(this);
     this.handleAttackChange = this.handleAttackChange.bind(this);
     this.handleDecayChange = this.handleDecayChange.bind(this);
@@ -44,54 +41,76 @@ class WebInstrument extends React.Component {
     this.handleOvertoneArrayChange = this.handleOvertoneArrayChange.bind(this);
     this.handleLFOFrequencyChange = this.handleLFOFrequencyChange.bind(this);
     this.handleLFOAmplitudeChange = this.handleLFOAmplitudeChange.bind(this);
+    this.playMelody = this.playMelody.bind(this);
+    this.playSound = this.playSound.bind(this);
+    this.toneLength = this.toneLength.bind(this);
+    this.createOscilator = this.createOscilator.bind(this);
+    this.createEnvelope = this.createEnvelope.bind(this);
+    this.createLFO = this.createLFO.bind(this);
+    this.startPlaying = this.startPlaying.bind(this);
+    this.stopPlaying = this.stopPlaying.bind(this);
+    this.readyContext = this.readyContext.bind(this);
   }
   componentDidMount() {
-    globalNotesGrid = this.state.notesGrid;
-    globalAttack = this.state.attack;
-    globalDecay = this.state.decay;
-    globalSustain = this.state.sustain;
-    globalRelease = this.state.release;
-    globalOvertonesAmount = this.state.overtonesAmount;
-    globalOvertonesArray = this.state.overtonesArray;
-    globalLFOFrequency = this.state.lfoFrequency;
-    globalLFOAmplitude = this.state.lfoAmplitude;
+    $(document).ready(this.readyContext);
+    $("#play-sound").click(this.startPlaying);
+    $("#stop-sound").click(this.stopPlaying);
+  }
+  startPlaying() {
+    var tempo = 120.0;
+    var secondsPerBeat = 60.0 / tempo;
+    if (!this.state.timer) {
+      this.playMelody(secondsPerBeat);
+      var playMelody = this.playMelody;
+      this.setState({timer: setInterval(function() {
+        playMelody(secondsPerBeat)
+      }, 0.25 * secondsPerBeat * numberOfBeats * 1000)});
+    }
+  }
+  stopPlaying() {
+    if (this.state.timer) {
+      clearInterval(this.state.timer);
+      this.setState({timer: null});
+    }
+  }
+  readyContext() {
+    try {
+      window.AudioContext = window.AudioContext;
+      context = new AudioContext();
+      this.setState({context: context});
+    }
+    catch(e) {
+      alert(e);
+    }
   }
   handleAttackChange(newAttack) {
     this.setState({attack: newAttack});
-    globalAttack = this.state.attack;
   }
   handleDecayChange(newDecay) {
     this.setState({decay: newDecay});
-    globalDecay = this.state.decay;
   }
   handleSustainChange(newSustain) {
     this.setState({sustain: newSustain});
-    globalSustain = this.state.sustain;
   }
   handleReleaseChange(newRelease) {
     this.setState({release: newRelease});
-    globalRelease = this.state.release;
   }
   handePianoRollChange(newNotesGrid) {
     this.setState({notesGrid: newNotesGrid});
-    globalNotesGrid = this.state.notesGrid;
   }
   handleOvertoneAmountChange(newOvertonesAmount) {
     this.setState({overtonesAmount: newOvertonesAmount});
-    globalOvertonesAmount = newOvertonesAmount;
   }
   handleOvertoneArrayChange(newOvertonesArray) {
     this.setState({overtonesArray: newOvertonesArray});
-    globalOvertonesArray = newOvertonesArray;
   }
   handleLFOFrequencyChange(newFrequency) {
     this.setState({lfoFrequency: newFrequency});
-    globalLFOFrequency = newFrequency;
   }
   handleLFOAmplitudeChange(newAmplitude) {
     this.setState({lfoAmplitude: newAmplitude});
-    globalLFOAmplitude = newAmplitude;
   }
+
   render() {
     return (
       <div className="WebInstrument row" id="content">
@@ -104,125 +123,90 @@ class WebInstrument extends React.Component {
       </div>
     );
   }
+  playMelody(secondsPerBeat) {
+    for (var i = 0; i < numberOfTones; i++) {
+      for (var j = 0; j < numberOfBeats; j++) {
+        if (j > 0) {
+          if (this.state.notesGrid[i][j] && !this.state.notesGrid[i][j-1]) {
+            this.playSound(toneFreqs[i], this.state.context.currentTime + 0.25 * j * secondsPerBeat, 0.25 * secondsPerBeat * this.toneLength(i, j));
+          }
+        }
+        else if (this.state.notesGrid[i][j]) {
+          this.playSound(toneFreqs[i], this.state.context.currentTime + 0.25 * j * secondsPerBeat, 0.25 * secondsPerBeat * this.toneLength(i, j));
+        }
+      }
+    }
+  }
+  playSound(freq, startTime, length) {
+    var envelopeAttack = length * this.state.attack / 100;
+    var envelopeDecay = length * this.state.decay / 100;
+    var envelopeRelease = length * this.state.release / 100;
+    var envelopeSustainTime = length - envelopeAttack - envelopeDecay - envelopeRelease;
+    var envelopeSustainGain = this.state.sustain / 100;
+
+    var gainSum = 0;
+    for (var i = 0; i <= this.state.overtonesAmount; i++) {
+      gainSum += this.state.overtonesArray[i] / 100;
+    }
+
+    var lfo = this.createLFO();
+
+    for (var i = 0; i < this.state.overtonesAmount; i++) {
+      this.createOscilator(lfo, freq * (i+1), this.state.overtonesArray[i] / (100 * gainSum), startTime,
+        length, envelopeAttack, envelopeDecay, envelopeSustainTime, envelopeRelease, envelopeSustainGain);
+    }
+  }
+  toneLength(row, column) {
+    if (this.state.notesGrid[row][column]) {
+      return 1 + this.toneLength(row, column+1);
+    } else {
+      return 0;
+    }
+  }
+  createOscilator(lfo, freq, gain, startTime, length, attack, decay, sustain, release, envelopeSustainGain) {
+    // Gain should be limited so the channel does not distort. Setting to one tenth of the value for now.
+    gain = gain / 10;
+
+    var oscillator = this.state.context.createOscillator();
+    oscillator.frequency.value = freq;
+    var envelope = this.createEnvelope(gain, startTime, attack, decay, sustain, release, envelopeSustainGain);
+
+    lfo.connect(oscillator.frequency);
+    oscillator.connect(envelope);
+    envelope.connect(this.state.context.destination);
+    oscillator.start(startTime);
+    oscillator.stop(startTime + length);
+  }
+  createEnvelope(gain, startTime, attack, decay, sustain, release, envelopeSustainGain) {
+    // Setting the Envelope
+    var gainNode = this.state.context.createGain();
+    gainNode.gain.setValueAtTime(0.0, startTime);
+    // Attack
+    gainNode.gain.linearRampToValueAtTime(+gain.toFixed(2), startTime + attack);
+    // Decay
+    gainNode.gain.setTargetAtTime(gain * envelopeSustainGain, startTime + attack, decay * 0.2);
+    // Release
+    var timeBeforeRelease = startTime + attack + decay;
+    if (sustain > 0) {
+      timeBeforeRelease += sustain;
+    }
+    gainNode.gain.setTargetAtTime(0.0, timeBeforeRelease, release * 0.2);
+
+    return gainNode;
+  }
+  // A modulator have a oscillator and a gain
+  createLFO() {
+    var detuneOscillator = this.state.context.createOscillator();
+    var detuneGain = this.state.context.createGain();
+    detuneOscillator.frequency.value = this.state.lfoFrequency;
+    detuneGain.gain.value = this.state.lfoAmplitude;
+    detuneOscillator.connect(detuneGain);
+    detuneOscillator.start(0);
+    return detuneGain;
+  }
 }
 
 render(
   <WebInstrument/>,
   document.getElementById('react-web-instrument')
 );
-
-// Maintain public array with notes?
-$(document).ready(function () {
-  try {
-    window.AudioContext = window.AudioContext;
-    context = new AudioContext();
-  }
-  catch(e) {
-    alert(e);
-  }
-});
-
-$("#play-sound").click(function () {
-  // Setting tempo to 120 BPM just for now
-  var tempo = 120.0;
-  var secondsPerBeat = 60.0 / tempo;
-  if (!timer) {
-    playMelody(secondsPerBeat);
-    timer = setInterval(function() { playMelody(secondsPerBeat) }, 0.25 * secondsPerBeat * numberOfBeats * 1000);
-  }
-});
-
-$("#stop-sound").click(function () {
-  if (timer) {
-    clearInterval(timer);
-    timer = null;
-  }
-});
-
-function playMelody (secondsPerBeat) {
-  for (var i = 0; i < numberOfTones; i++) {
-    for (var j = 0; j < numberOfBeats; j++) {
-      if (j > 0) {
-        if (globalNotesGrid[i][j] && !globalNotesGrid[i][j-1]) {
-          playSound(toneFreqs[i], context.currentTime + 0.25 * j * secondsPerBeat, 0.25 * secondsPerBeat * toneLength(i, j));
-        }
-      }
-      else if (globalNotesGrid[i][j]) {
-        playSound(toneFreqs[i], context.currentTime + 0.25 * j * secondsPerBeat, 0.25 * secondsPerBeat * toneLength(i, j));
-      }
-    }
-  }
-}
-
-function playSound (freq, startTime, length) {
-  var envelopeAttack = length * globalAttack / 100;
-  var envelopeDecay = length * globalDecay / 100;
-  var envelopeRelease = length * globalRelease / 100;
-  var envelopeSustainTime = length - envelopeAttack - envelopeDecay - envelopeRelease;
-  var envelopeSustainGain = globalSustain / 100;
-
-  var gainSum = 0;
-  for (var i = 0; i <= globalOvertonesAmount; i++) {
-    gainSum += globalOvertonesArray[i] / 100;
-  }
-
-  var lfo = createLFO();
-
-  for (var i = 0; i < globalOvertonesAmount; i++) {
-    createOscilator(lfo, freq * (i+1), globalOvertonesArray[i] / (100 * gainSum), startTime,
-      length, envelopeAttack, envelopeDecay, envelopeSustainTime, envelopeRelease, envelopeSustainGain);
-  }
-}
-
-function toneLength (row, column) {
-  if (globalNotesGrid[row][column]) {
-    return 1 + toneLength(row, column+1);
-  } else {
-    return 0;
-  }
-}
-
-function createOscilator(lfo, freq, gain, startTime, length, attack, decay, sustain, release, envelopeSustainGain) {
-  // Gain should be limited so the channel does not distort. Setting to one tenth of the value for now.
-  gain = gain / 10;
-
-  var oscillator = context.createOscillator();
-  oscillator.frequency.value = freq;
-  var envelope = createEnvelope(gain, startTime, attack, decay, sustain, release, envelopeSustainGain);
-
-  lfo.connect(oscillator.frequency);
-  oscillator.connect(envelope);
-  envelope.connect(context.destination);
-  oscillator.start(startTime);
-  oscillator.stop(startTime + length);
-}
-
-
-function createEnvelope(gain, startTime, attack, decay, sustain, release, envelopeSustainGain) {
-  // Setting the Envelope
-  var gainNode = context.createGain();
-  gainNode.gain.setValueAtTime(0.0, startTime);
-  // Attack
-  gainNode.gain.linearRampToValueAtTime(+gain.toFixed(2), startTime + attack);
-  // Decay
-  gainNode.gain.setTargetAtTime(gain * envelopeSustainGain, startTime + attack, decay * 0.2);
-  // Release
-  var timeBeforeRelease = startTime + attack + decay;
-  if (sustain > 0) {
-    timeBeforeRelease += sustain;
-  }
-  gainNode.gain.setTargetAtTime(0.0, timeBeforeRelease, release * 0.2);
-
-  return gainNode;
-}
-
-// A modulator have a oscillator and a gain
-function createLFO() {
-  var detuneOscillator = context.createOscillator();
-  var detuneGain = context.createGain();
-  detuneOscillator.frequency.value = globalLFOFrequency;
-  detuneGain.gain.value = globalLFOAmplitude;
-  detuneOscillator.connect(detuneGain);
-  detuneOscillator.start(0);
-  return detuneGain;
-}
