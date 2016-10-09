@@ -116,6 +116,13 @@ $("#play-sound").click(function () {
   }
 });
 
+$("#stop-sound").click(function () {
+  if (timer) {
+    clearInterval(timer);
+    timer = null;
+  }
+});
+
 function playMelody (secondsPerBeat) {
   for (var i = 0; i < numberOfTones; i++) {
     for (var j = 0; j < numberOfBeats; j++) {
