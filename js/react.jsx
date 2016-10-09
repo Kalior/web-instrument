@@ -166,13 +166,23 @@ function toneLength (row, column) {
   }
 }
 
-function createOscilator (freq, gain, startTime, length, attack, decay, sustain, release, envelopeSustainGain) {
+function createOscilator(lfo, freq, gain, startTime, length, attack, decay, sustain, release, envelopeSustainGain) {
   // Gain should be limited so the channel does not distort. Setting to one tenth of the value for now.
   gain = gain / 10;
 
   var oscillator = context.createOscillator();
   oscillator.frequency.value = freq;
+  var envelope = createEnvelope(gain, startTime, attack, decay, sustain, release, envelopeSustainGain);
 
+  lfo.connect(oscillator.frequency);
+  oscillator.connect(envelope);
+  envelope.connect(context.destination);
+  oscillator.start(startTime);
+  oscillator.stop(startTime + length);
+}
+
+
+function createEnvelope(gain, startTime, attack, decay, sustain, release, envelopeSustainGain) {
   // Setting the Envelope
   var gainNode = context.createGain();
   gainNode.gain.setValueAtTime(0.0, startTime);
@@ -187,10 +197,8 @@ function createOscilator (freq, gain, startTime, length, attack, decay, sustain,
   }
   gainNode.gain.setTargetAtTime(0.0, timeBeforeRelease, release * 0.2);
 
-  gainNode.connect(context.destination);
-  oscillator.connect(gainNode)
-  oscillator.start(startTime);
-  oscillator.stop(startTime + length);
+  return gainNode;
+}
 
 // A modulator have a oscillator and a gain
 function createLFO() {
