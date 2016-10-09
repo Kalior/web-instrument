@@ -30,7 +30,7 @@ export default class PianoRollContainer extends React.Component {
   handleMouseDown(event) {
     var canvas = document.getElementById("piano-roll-canvas");
     this.setState({mouseDownCanvas: true});
-    var mousePos = getMouseCoordinates(canvas, event);
+    var mousePos = getMouseGridCoordinates(canvas, event);
     if (!this.state.notesGrid[mousePos.row][mousePos.column]) {
       this.setState({adding: true});
     }
@@ -39,7 +39,6 @@ export default class PianoRollContainer extends React.Component {
     }
   }
   drawCanvas() {
-    // this should probably know about the grid.
     var canvas = document.getElementById("piano-roll-canvas");
     var context = canvas.getContext("2d");
     context.clearRect(0, 0, canvas.width, canvas.height);
@@ -85,7 +84,7 @@ export default class PianoRollContainer extends React.Component {
     event.preventDefault();
     if (this.state.mouseDownCanvas) {
       var canvas = document.getElementById("piano-roll-canvas");
-      var mousePos = getMouseCoordinates(canvas, event);
+      var mousePos = getMouseGridCoordinates(canvas, event);
       if (!this.state.notesGrid[mousePos.row][mousePos.column] && this.state.adding) {
         this.handleCellClicked(true, mousePos.row, mousePos.column);
         this.drawCanvas();
@@ -99,7 +98,7 @@ export default class PianoRollContainer extends React.Component {
   handleMouseClick(event) {
     event.preventDefault();
     var canvas = document.getElementById("piano-roll-canvas");
-    var mousePos = getMouseCoordinates(canvas, event);
+    var mousePos = getMouseGridCoordinates(canvas, event);
     if (!this.state.notesGrid[mousePos.row][mousePos.column] && this.state.adding) {
       this.handleCellClicked(true, mousePos.row, mousePos.column);
     }
@@ -124,13 +123,13 @@ export default class PianoRollContainer extends React.Component {
   }
 }
 
- //integrate this in the react component later, will give access to state and such.
-function getMouseCoordinates(canvas, event) {
+function getMouseGridCoordinates(canvas, event) {
   var rect = canvas.getBoundingClientRect();
   return {row: Math.floor((event.clientX - rect.left) / pianoRollCellSize),
           column: Math.floor((event.clientY - rect.top) / pianoRollCellSize)};
 }
 
+// Found on stack overflow, thanks for that
 function roundRect(context, x, y, w, h, r) {
   if (w < 2 * r) r = w / 2;
   if (h < 2 * r) r = h / 2;
