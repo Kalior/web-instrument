@@ -3,6 +3,9 @@ import {render} from 'react-dom';
 import EnvelopeContainer from './envelope.js'
 import PianoRollContainer from './pianoRoll.js'
 import OverToneSlidersContainer from './overtoneSliders.js'
+import LowFrequencyModulationContainer from './lowFrequencyModulation.jsx'
+import Rcslider from 'rc-slider-colored';
+
 
 var context;
 var timer;
@@ -13,7 +16,7 @@ var toneFreqs = [493.88, 466.16, 440.00, 415.30, 391.995, 369.99, 349.23, 329.62
 
 var globalNotesGrid = [];
 var globalOvertonesArray = [];
-var globalAttack, globalDecay, globalSustain, globalRelease, globalOvertonesAmount;
+var globalAttack, globalDecay, globalSustain, globalRelease, globalOvertonesAmount, globalLFOFrequency, globalLFOAmplitude;
 
 class WebInstrument extends React.Component {
   constructor(props) {
@@ -31,7 +34,8 @@ class WebInstrument extends React.Component {
         initialNotesGrid[i][j] = false;
       }
     }
-    this.state = {notesGrid: initialNotesGrid, overtonesAmount: 10, overtonesArray: initialOvertoneGainArray, attack: 10, decay: 20, sustain: 50, release: 30};
+    this.state = {notesGrid: initialNotesGrid, overtonesAmount: 10, overtonesArray: initialOvertoneGainArray,
+        attack: 10, decay: 20, sustain: 50, release: 30, detuneValue: 0, lfoFrequency: 5, lfoAmplitude: 2};
     this.handePianoRollChange = this.handePianoRollChange.bind(this);
     this.handleAttackChange = this.handleAttackChange.bind(this);
     this.handleDecayChange = this.handleDecayChange.bind(this);
@@ -39,6 +43,8 @@ class WebInstrument extends React.Component {
     this.handleReleaseChange = this.handleReleaseChange.bind(this);
     this.handleOvertoneAmountChange = this.handleOvertoneAmountChange.bind(this);
     this.handleOvertoneArrayChange = this.handleOvertoneArrayChange.bind(this);
+    this.handleLFOFrequencyChange = this.handleLFOFrequencyChange.bind(this);
+    this.handleLFOAmplitudeChange = this.handleLFOAmplitudeChange.bind(this);
   }
   componentDidMount() {
     globalNotesGrid = this.state.notesGrid;
@@ -48,6 +54,8 @@ class WebInstrument extends React.Component {
     globalRelease = this.state.release;
     globalOvertonesAmount = this.state.overtonesAmount;
     globalOvertonesArray = this.state.overtonesArray;
+    globalLFOFrequency = this.state.lfoFrequency;
+    globalLFOAmplitude = this.state.lfoAmplitude;
   }
   handleAttackChange(newAttack) {
     this.setState({attack: newAttack});
@@ -77,6 +85,14 @@ class WebInstrument extends React.Component {
     this.setState({overtonesArray: newOvertonesArray});
     globalOvertonesArray = newOvertonesArray;
   }
+  handleLFOFrequencyChange(newFrequency) {
+    this.setState({lfoFrequency: newFrequency});
+    globalLFOFrequency = newFrequency;
+  }
+  handleLFOAmplitudeChange(newAmplitude) {
+    this.setState({lfoAmplitude: newAmplitude});
+    globalLFOAmplitude = newAmplitude;
+  }
   render() {
     return (
       <div className="WebInstrument row" id="content">
@@ -85,6 +101,7 @@ class WebInstrument extends React.Component {
             initalOvertonesAmount={this.state.overtonesAmount} initialOvertoneGainArray={this.state.overtonesArray}/>
           <EnvelopeContainer onAttackChange={this.handleAttackChange} onDecayChange={this.handleDecayChange}
             onReleaseChange={this.handleReleaseChange} onSustainChange={this.handleSustainChange}/>
+          <LowFrequencyModulationContainer onFrequencyChange={this.handleLFOFrequencyChange} onAmplitudeChange={this.handleLFOAmplitudeChange} />
       </div>
     );
   }
