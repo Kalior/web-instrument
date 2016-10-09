@@ -4,7 +4,6 @@ import EnvelopeContainer from './envelope.js'
 import PianoRollContainer from './pianoRoll.js'
 import OverToneSlidersContainer from './overtoneSliders.js'
 import LowFrequencyModulationContainer from './lowFrequencyModulation.jsx'
-import Rcslider from 'rc-slider-colored';
 
 
 var context;
