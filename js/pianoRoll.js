@@ -108,15 +108,11 @@ export default class PianoRollContainer extends React.Component {
     this.drawCanvas();
   }
   render() {
-    var toneNames = ["B", "A#", "A", "G#", "G", "F#", "F", "E", "D#", "D", "C#", "C"];
-    var isWhite = [true, false, true, false, true, false, true, true, false, true, false, true];
     return (
       <div className="PianoRollContainer container column small-centered small-8">
         <b>Melody</b>
         <div>
           <canvas id="piano-roll-canvas" width={12*pianoRollCellSize+4} height={16*pianoRollCellSize+4}/>
-          <br></br>
-          <b>B A# A G# G F# F E D# D C# C</b>
         </div>
       </div>
     );
