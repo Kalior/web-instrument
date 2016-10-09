@@ -1,5 +1,5 @@
 import React from 'react';
-import Rcslider from 'rc-slider';
+import Rcslider from 'rc-slider-colored';
 
 export default class OverToneSlidersContainer extends React.Component {
   constructor(props) {
@@ -23,7 +23,7 @@ export default class OverToneSlidersContainer extends React.Component {
     for (var i = 0; i < this.state.amountOfOvertones; i++) {
       overtoneSliders.push(
         <Rcslider id={'gain-control-' + i}
-          min={0} max={100} defaultValue={this.state.overtoneGainArray[i]} onAfterChange={this.onAmountChange} key={i} onAfterChange={this.onGainChange.bind(this, i)}/>);
+          min={0} max={100} defaultValue={this.state.overtoneGainArray[i]} key={i} onAfterChange={this.onGainChange.bind(this, i)}/>);
     }
     return(
       <div className="OvertToneSlidersContainer container column small-centered small-8">
