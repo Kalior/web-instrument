@@ -115,7 +115,7 @@ render(
 // Maintain public array with notes?
 $(document).ready(function () {
   try {
-    window.AudioContext = window.AudioContext||window.webkitAudioContext;
+    window.AudioContext = window.AudioContext;
     context = new AudioContext();
   }
   catch(e) {
