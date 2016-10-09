@@ -4,12 +4,7 @@ import Rcslider from 'rc-slider';
 export default class OverToneSlidersContainer extends React.Component {
   constructor(props) {
     super(props);
-    var initialOvertoneGainArray = [];
-    for (var i = 0; i <= 25; i++) {
-      initialOvertoneGainArray[i] = 0;
-    }
-    initialOvertoneGainArray[0] = 70;
-    this.state = {amountOfOvertones: 10, overtoneGainArray: initialOvertoneGainArray};
+    this.state = {amountOfOvertones: this.props.initalOvertonesAmount, overtoneGainArray: this.props.initialOvertoneGainArray};
     this.onOvertoneAmountChange = this.onOvertoneAmountChange.bind(this);
     this.onGainChange = this.onGainChange.bind(this);
   }
@@ -22,10 +17,6 @@ export default class OverToneSlidersContainer extends React.Component {
     newOvertoneGainArray[overtoneIndex] = gain;
     this.setState({overtoneGainArray: newOvertoneGainArray});
     this.props.onOvertoneArrayChange(newOvertoneGainArray);
-  }
-  componentDidMount() {
-    this.props.onOvertoneArrayChange(this.state.overtoneGainArray);
-    this.props.onOvertoneAmountChange(this.state.amountOfOvertones);
   }
   render() {
     var overtoneSliders = [];
