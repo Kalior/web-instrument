@@ -8,6 +8,8 @@ The purpose of this project is to create a web interfance for creating an instru
 - [x] Setting a melody
 - [ ] Some sort of resonance (maybe)
 - [x] Setting envelope
+- [x] Low frequency modulation
+- [ ] Multiple simultaneous instruments
 
 ## Developing
 
