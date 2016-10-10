@@ -5,7 +5,7 @@ import PianoRollContainer from './pianoRoll.js'
 import OverToneSlidersContainer from './overtoneSliders.js'
 import LowFrequencyModulationContainer from './lowFrequencyModulation.jsx'
 
-var toneFreqs = [493.88, 466.16, 440.00, 415.30, 391.995, 369.99, 349.23, 329.628, 311.13, 293.66, 277.18, 261.63];
+var toneFreqs = [493.88/2, 466.16/2, 440.00/2, 415.30/2, 391.995/2, 369.99/2, 349.23/2, 329.628/2, 311.13/2, 293.66/2, 277.18/2, 261.63/2];
 
 class WebInstrument extends React.Component {
   constructor(props) {
