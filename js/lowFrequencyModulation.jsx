@@ -25,7 +25,7 @@ export default class LowFrequencyModulationContainer extends React.Component {
         <Rcslider min={0} max={20} defaultValue={this.state.frequency} step={0.1} marks={{0: '0 hz', 20: '20 hz'}}
           onAfterChange={this.onFrequencyChange}/>
         <b>Amplitude of modulation</b>
-        <Rcslider min={0} max={5} defaultValue={this.state.amplitude} step={0.1} marks={{0: '0', 5: '5'}}
+        <Rcslider min={0} max={40} defaultValue={this.state.amplitude} step={0.1} marks={{0: '0', 40: '40'}}
           onAfterChange={this.onAmplitudeChange}/>
       </div>
     );

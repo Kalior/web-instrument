@@ -5,12 +5,6 @@ import PianoRollContainer from './pianoRoll.js'
 import OverToneSlidersContainer from './overtoneSliders.js'
 import LowFrequencyModulationContainer from './lowFrequencyModulation.jsx'
 
-
-var context;
-var timer;
-var numberOfBeats = 16;
-var numberOfTones = 12;
-
 var toneFreqs = [493.88, 466.16, 440.00, 415.30, 391.995, 369.99, 349.23, 329.628, 311.13, 293.66, 277.18, 261.63];
 
 class WebInstrument extends React.Component {
@@ -31,7 +25,7 @@ class WebInstrument extends React.Component {
     }
     this.state = {notesGrid: initialNotesGrid, overtonesAmount: 10, overtonesArray: initialOvertoneGainArray,
         attack: 10, decay: 20, sustain: 50, release: 30, detuneValue: 0, lfmFrequency: 5, lfmAmplitude: 2,
-        context: null, timer: null, playing: false};
+        context: null, timer: null, playing: false, numberOfBeats: 16, numberOfTones: 12};
     this.handePianoRollChange = this.handePianoRollChange.bind(this);
     this.handleAttackChange = this.handleAttackChange.bind(this);
     this.handleDecayChange = this.handleDecayChange.bind(this);
@@ -52,7 +46,7 @@ class WebInstrument extends React.Component {
     this.readyContext = this.readyContext.bind(this);
   }
   componentDidMount() {
-    $(document).ready(this.readyContext);
+    this.readyContext();
     $("#play-sound").click(this.startPlaying);
     $("#stop-sound").click(this.stopPlaying);
   }
@@ -62,9 +56,12 @@ class WebInstrument extends React.Component {
     if (!this.state.playing) {
       this.playMelody(secondsPerBeat);
       var playMelody = this.playMelody;
-      this.setState({playing: true, timer: setInterval(function() {
-        playMelody(secondsPerBeat)
-      }, 0.25 * secondsPerBeat * numberOfBeats * 1000),});
+      this.setState({
+        playing: true,
+        timer: setInterval(function() {
+          playMelody(secondsPerBeat)
+        }, 0.25 * secondsPerBeat * this.state.numberOfBeats * 1000)
+      });
     }
   }
   stopPlaying() {
@@ -76,8 +73,7 @@ class WebInstrument extends React.Component {
   readyContext() {
     try {
       window.AudioContext = window.AudioContext;
-      context = new AudioContext();
-      this.setState({context: context});
+      this.setState({context: new AudioContext()});
     }
     catch(e) {
       alert(e);
@@ -124,8 +120,8 @@ class WebInstrument extends React.Component {
     );
   }
   playMelody(secondsPerBeat) {
-    for (var i = 0; i < numberOfTones; i++) {
-      for (var j = 0; j < numberOfBeats; j++) {
+    for (var i = 0; i < this.state.numberOfTones; i++) {
+      for (var j = 0; j < this.state.numberOfBeats; j++) {
         if (j > 0) {
           if (this.state.notesGrid[i][j] && !this.state.notesGrid[i][j-1]) {
             this.playSound(toneFreqs[i], this.state.context.currentTime + 0.25 * j * secondsPerBeat, 0.25 * secondsPerBeat * this.toneLength(i, j));
