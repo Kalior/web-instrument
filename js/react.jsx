@@ -120,20 +120,22 @@ class WebInstrument extends React.Component {
     );
   }
   playMelody(secondsPerBeat) {
+    var limiter = this.createLimiter();
+
     for (var i = 0; i < this.state.numberOfTones; i++) {
       for (var j = 0; j < this.state.numberOfBeats; j++) {
         if (j > 0) {
           if (this.state.notesGrid[i][j] && !this.state.notesGrid[i][j-1]) {
-            this.playSound(toneFreqs[i], this.state.context.currentTime + 0.25 * j * secondsPerBeat, 0.25 * secondsPerBeat * this.toneLength(i, j));
+            this.playSound(toneFreqs[i], this.state.context.currentTime + 0.25 * j * secondsPerBeat, 0.25 * secondsPerBeat * this.toneLength(i, j), limiter);
           }
         }
         else if (this.state.notesGrid[i][j]) {
-          this.playSound(toneFreqs[i], this.state.context.currentTime + 0.25 * j * secondsPerBeat, 0.25 * secondsPerBeat * this.toneLength(i, j));
+          this.playSound(toneFreqs[i], this.state.context.currentTime + 0.25 * j * secondsPerBeat, 0.25 * secondsPerBeat * this.toneLength(i, j), limiter);
         }
       }
     }
   }
-  playSound(freq, startTime, length) {
+  playSound(freq, startTime, length, limiter) {
     var envelopeAttack = length * this.state.attack / 100;
     var envelopeDecay = length * this.state.decay / 100;
     var envelopeRelease = length * this.state.release / 100;
@@ -148,7 +150,7 @@ class WebInstrument extends React.Component {
     var lfm = this.createLFM();
 
     for (var i = 0; i < this.state.overtonesAmount; i++) {
-      this.createOscilator(lfm, freq * (i+1), this.state.overtonesArray[i] / (100 * gainSum), startTime,
+      this.createOscilator(limiter, lfm, freq * (i+1), this.state.overtonesArray[i] / (100 * gainSum), startTime,
         length, envelopeAttack, envelopeDecay, envelopeSustainTime, envelopeRelease, envelopeSustainGain);
     }
   }
@@ -159,9 +161,9 @@ class WebInstrument extends React.Component {
       return 0;
     }
   }
-  createOscilator(lfm, freq, gain, startTime, length, attack, decay, sustain, release, envelopeSustainGain) {
+  createOscilator(limiter, lfm, freq, gain, startTime, length, attack, decay, sustain, release, envelopeSustainGain) {
     // Gain should be limited so the channel does not distort. Setting to one tenth of the value for now.
-    gain = gain / 10;
+    gain = gain / 2;
 
     var oscillator = this.state.context.createOscillator();
     oscillator.frequency.value = freq;
@@ -169,7 +171,8 @@ class WebInstrument extends React.Component {
 
     lfm.connect(oscillator.frequency);
     oscillator.connect(envelope);
-    envelope.connect(this.state.context.destination);
+    envelope.connect(limiter);
+
     oscillator.start(startTime);
     oscillator.stop(startTime + length);
   }
@@ -199,6 +202,19 @@ class WebInstrument extends React.Component {
     detuneOscillator.connect(detuneGain);
     detuneOscillator.start(0);
     return detuneGain;
+  }
+  createLimiter() {
+    var limiter = this.state.context.createDynamicsCompressor();
+
+    limiter.threshold.value = 0.0; // this is the pitfall, leave some headroom
+    limiter.knee.value = 0.0; // brute force
+    limiter.ratio.value = 20.0; // max compression
+    limiter.attack.value = 0.005; // 5ms attack
+    limiter.release.value = 0.050; // 50ms release
+
+    limiter.connect(this.state.context.destination);
+
+    return limiter;
   }
 }
 
