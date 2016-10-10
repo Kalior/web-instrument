@@ -38,12 +38,13 @@ class WebInstrument extends React.Component {
     this.playMelody = this.playMelody.bind(this);
     this.playSound = this.playSound.bind(this);
     this.toneLength = this.toneLength.bind(this);
-    this.createOscilator = this.createOscilator.bind(this);
+    this.createSource = this.createSource.bind(this);
     this.createEnvelope = this.createEnvelope.bind(this);
     this.createLFM = this.createLFM.bind(this);
     this.startPlaying = this.startPlaying.bind(this);
     this.stopPlaying = this.stopPlaying.bind(this);
     this.readyContext = this.readyContext.bind(this);
+    this.createLimiter = this.createLimiter.bind(this);
   }
   componentDidMount() {
     this.readyContext();
@@ -136,22 +137,19 @@ class WebInstrument extends React.Component {
     }
   }
   playSound(freq, startTime, length, limiter) {
-    var envelopeAttack = length * this.state.attack / 100;
-    var envelopeDecay = length * this.state.decay / 100;
-    var envelopeRelease = length * this.state.release / 100;
-    var envelopeSustainTime = length - envelopeAttack - envelopeDecay - envelopeRelease;
-    var envelopeSustainGain = this.state.sustain / 100;
-
     var gainSum = 0;
     for (var i = 0; i <= this.state.overtonesAmount; i++) {
       gainSum += this.state.overtonesArray[i] / 100;
     }
 
     var lfm = this.createLFM();
+    var envelope = this.createEnvelope(1, startTime, length);
 
     for (var i = 0; i < this.state.overtonesAmount; i++) {
-      this.createOscilator(limiter, lfm, freq * (i+1), this.state.overtonesArray[i] / (100 * gainSum), startTime,
-        length, envelopeAttack, envelopeDecay, envelopeSustainTime, envelopeRelease, envelopeSustainGain);
+      var source = this.createSource(this.state.overtonesArray[i] / (100 * gainSum * 2), freq * (i+1), startTime, length);
+      lfm.connect(source.oscillator.frequency);
+      source.gain.connect(envelope);
+      envelope.connect(limiter);
     }
   }
   toneLength(row, column) {
@@ -161,35 +159,41 @@ class WebInstrument extends React.Component {
       return 0;
     }
   }
-  createOscilator(limiter, lfm, freq, gain, startTime, length, attack, decay, sustain, release, envelopeSustainGain) {
-    // Gain should be limited so the channel does not distort. Setting to one tenth of the value for now.
-    gain = gain / 2;
-
+  createSource(gain, freq, startTime, length) {
     var oscillator = this.state.context.createOscillator();
-    oscillator.frequency.value = freq;
-    var envelope = this.createEnvelope(gain, startTime, attack, decay, sustain, release, envelopeSustainGain);
+    var gainNode = this.state.context.createGain();
 
-    lfm.connect(oscillator.frequency);
-    oscillator.connect(envelope);
-    envelope.connect(limiter);
+    gainNode.gain.value = gain;
+
+    oscillator.frequency.value = freq;
 
     oscillator.start(startTime);
     oscillator.stop(startTime + length);
+    oscillator.connect(gainNode);
+
+    return({oscillator: oscillator,
+            gain: gainNode});
   }
-  createEnvelope(gain, startTime, attack, decay, sustain, release, envelopeSustainGain) {
+  createEnvelope(gain, startTime, length) {
+    var attack = length * this.state.attack / 100;
+    var decay = length * this.state.decay / 100;
+    var release = length * this.state.release / 100;
+    var sustainTime = length - attack - decay - release;
+    var sustainGain = this.state.sustain / 100;
+
     // Setting the Envelope
     var gainNode = this.state.context.createGain();
     gainNode.gain.setValueAtTime(0.0, startTime);
     // Attack
-    gainNode.gain.linearRampToValueAtTime(+gain.toFixed(2), startTime + attack);
+    gainNode.gain.linearRampToValueAtTime(gain, startTime + attack);
     // Decay
-    gainNode.gain.setTargetAtTime(gain * envelopeSustainGain, startTime + attack, decay * 0.2);
+    gainNode.gain.setTargetAtTime(gain * sustainGain, startTime + attack, decay * 0.2);
     // Release
     var timeBeforeRelease = startTime + attack + decay;
-    if (sustain > 0) {
-      timeBeforeRelease += sustain;
+    if (sustainTime > 0) {
+      timeBeforeRelease += sustainTime;
     }
-    gainNode.gain.setTargetAtTime(0.0, timeBeforeRelease, release * 0.2);
+    gainNode.gain.setTargetAtTime(0.0, timeBeforeRelease-(length*0.1), release * 0.2);
 
     return gainNode;
   }
