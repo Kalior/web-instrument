@@ -30,7 +30,7 @@ class WebInstrument extends React.Component {
       }
     }
     this.state = {notesGrid: initialNotesGrid, overtonesAmount: 10, overtonesArray: initialOvertoneGainArray,
-        attack: 10, decay: 20, sustain: 50, release: 30, detuneValue: 0, lfoFrequency: 5, lfoAmplitude: 2,
+        attack: 10, decay: 20, sustain: 50, release: 30, detuneValue: 0, lfmFrequency: 5, lfmAmplitude: 2,
         context: null, timer: null};
     this.handePianoRollChange = this.handePianoRollChange.bind(this);
     this.handleAttackChange = this.handleAttackChange.bind(this);
@@ -39,14 +39,14 @@ class WebInstrument extends React.Component {
     this.handleReleaseChange = this.handleReleaseChange.bind(this);
     this.handleOvertoneAmountChange = this.handleOvertoneAmountChange.bind(this);
     this.handleOvertoneArrayChange = this.handleOvertoneArrayChange.bind(this);
-    this.handleLFOFrequencyChange = this.handleLFOFrequencyChange.bind(this);
-    this.handleLFOAmplitudeChange = this.handleLFOAmplitudeChange.bind(this);
+    this.handleLFMFrequencyChange = this.handleLFMFrequencyChange.bind(this);
+    this.handleLFMAmplitudeChange = this.handleLFMAmplitudeChange.bind(this);
     this.playMelody = this.playMelody.bind(this);
     this.playSound = this.playSound.bind(this);
     this.toneLength = this.toneLength.bind(this);
     this.createOscilator = this.createOscilator.bind(this);
     this.createEnvelope = this.createEnvelope.bind(this);
-    this.createLFO = this.createLFO.bind(this);
+    this.createLFM = this.createLFM.bind(this);
     this.startPlaying = this.startPlaying.bind(this);
     this.stopPlaying = this.stopPlaying.bind(this);
     this.readyContext = this.readyContext.bind(this);
@@ -104,11 +104,11 @@ class WebInstrument extends React.Component {
   handleOvertoneArrayChange(newOvertonesArray) {
     this.setState({overtonesArray: newOvertonesArray});
   }
-  handleLFOFrequencyChange(newFrequency) {
-    this.setState({lfoFrequency: newFrequency});
+  handleLFMFrequencyChange(newFrequency) {
+    this.setState({lfmFrequency: newFrequency});
   }
-  handleLFOAmplitudeChange(newAmplitude) {
-    this.setState({lfoAmplitude: newAmplitude});
+  handleLFMAmplitudeChange(newAmplitude) {
+    this.setState({lfmAmplitude: newAmplitude});
   }
 
   render() {
@@ -119,7 +119,7 @@ class WebInstrument extends React.Component {
             initalOvertonesAmount={this.state.overtonesAmount} initialOvertoneGainArray={this.state.overtonesArray}/>
           <EnvelopeContainer onAttackChange={this.handleAttackChange} onDecayChange={this.handleDecayChange}
             onReleaseChange={this.handleReleaseChange} onSustainChange={this.handleSustainChange}/>
-          <LowFrequencyModulationContainer onFrequencyChange={this.handleLFOFrequencyChange} onAmplitudeChange={this.handleLFOAmplitudeChange} />
+          <LowFrequencyModulationContainer onFrequencyChange={this.handleLFMFrequencyChange} onAmplitudeChange={this.handleLFMAmplitudeChange} />
       </div>
     );
   }
@@ -149,10 +149,10 @@ class WebInstrument extends React.Component {
       gainSum += this.state.overtonesArray[i] / 100;
     }
 
-    var lfo = this.createLFO();
+    var lfm = this.createLFM();
 
     for (var i = 0; i < this.state.overtonesAmount; i++) {
-      this.createOscilator(lfo, freq * (i+1), this.state.overtonesArray[i] / (100 * gainSum), startTime,
+      this.createOscilator(lfm, freq * (i+1), this.state.overtonesArray[i] / (100 * gainSum), startTime,
         length, envelopeAttack, envelopeDecay, envelopeSustainTime, envelopeRelease, envelopeSustainGain);
     }
   }
@@ -163,7 +163,7 @@ class WebInstrument extends React.Component {
       return 0;
     }
   }
-  createOscilator(lfo, freq, gain, startTime, length, attack, decay, sustain, release, envelopeSustainGain) {
+  createOscilator(lfm, freq, gain, startTime, length, attack, decay, sustain, release, envelopeSustainGain) {
     // Gain should be limited so the channel does not distort. Setting to one tenth of the value for now.
     gain = gain / 10;
 
@@ -171,7 +171,7 @@ class WebInstrument extends React.Component {
     oscillator.frequency.value = freq;
     var envelope = this.createEnvelope(gain, startTime, attack, decay, sustain, release, envelopeSustainGain);
 
-    lfo.connect(oscillator.frequency);
+    lfm.connect(oscillator.frequency);
     oscillator.connect(envelope);
     envelope.connect(this.state.context.destination);
     oscillator.start(startTime);
@@ -195,11 +195,11 @@ class WebInstrument extends React.Component {
     return gainNode;
   }
   // A modulator have a oscillator and a gain
-  createLFO() {
+  createLFM() {
     var detuneOscillator = this.state.context.createOscillator();
     var detuneGain = this.state.context.createGain();
-    detuneOscillator.frequency.value = this.state.lfoFrequency;
-    detuneGain.gain.value = this.state.lfoAmplitude;
+    detuneOscillator.frequency.value = this.state.lfmFrequency;
+    detuneGain.gain.value = this.state.lfmAmplitude;
     detuneOscillator.connect(detuneGain);
     detuneOscillator.start(0);
     return detuneGain;
