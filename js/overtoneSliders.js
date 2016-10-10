@@ -22,8 +22,10 @@ export default class OverToneSlidersContainer extends React.Component {
     var overtoneSliders = [];
     for (var i = 0; i < this.state.amountOfOvertones; i++) {
       overtoneSliders.push(
-        <Rcslider id={'gain-control-' + i}
-          min={0} max={100} defaultValue={this.state.overtoneGainArray[i]} key={i} onAfterChange={this.onGainChange.bind(this, i)}/>);
+        <Rcslider id={'gain-control-' + i} className={"overtone-slider"}
+          min={0} max={100} defaultValue={this.state.overtoneGainArray[i]} key={i}
+          onAfterChange={this.onGainChange.bind(this, i)}
+          marks={{0: '0%', 100: '100 %'}} />);
     }
     return(
       <div className="OvertToneSlidersContainer container column small-centered small-8">
@@ -50,7 +52,8 @@ var OverTonesAmountSlider = React.createClass({
   render: function() {
     return(
       <Rcslider className="OverTonesAmountSlider" id="number-overtones-slider"
-        min={0} max={25} defaultValue={this.state.amountOfOvertones} onAfterChange={this.onAmountChange}/>
+        min={0} max={25} defaultValue={this.state.amountOfOvertones} onAfterChange={this.onAmountChange}
+        marks={{0: '0 tones', 25: '25 tones'}}/>
     );
   }
 });

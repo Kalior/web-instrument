@@ -94,16 +94,16 @@ export default class EnvelopeContainer extends React.Component {
           <br></br>
           <b>Attack</b>
           <Rcslider id={'attack-envelope-input'} defaultValue={this.state.attack}
-            min={0} max={100} onChange={this.handleAttackChange}  marks={{0: {color: '#2199e8'}}}/>
+            min={0} max={100} onChange={this.handleAttackChange}  marks={{0: {color: '#2199e8'}, 100: {}}}/>
           <b>Decay</b>
           <Rcslider id={'envelope-decay-input'} defaultValue={this.state.decay}
-            min={1} max={100} onChange={this.handleDecayChange} marks={{1: {color: '#3adb76'}}}/>
+            min={1} max={100} onChange={this.handleDecayChange} marks={{1: {color: '#3adb76'}, 100: {}}}/>
           <b>Sustain</b>
           <Rcslider id={'envelope-sustain-input'} defaultValue={this.state.sustain}
-            min={0} max={100} onChange={this.handleSustainChange} marks={{0: {color: '#777777'}}}/>
+            min={0} max={100} onChange={this.handleSustainChange} marks={{0: {color: '#777777'}, 100: {}}}/>
           <b>Release</b>
           <Rcslider id={'envelope-release-input'} defaultValue={this.state.release}
-            min={0} max={100} onChange={this.handleReleaseChange} marks={{0: {color: '#ec5840'}}}/>
+            min={0} max={100} onChange={this.handleReleaseChange} marks={{0: {color: '#ec5840'}, 100: {}}}/>
         </div>
       </div>
     );
