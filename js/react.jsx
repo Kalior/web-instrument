@@ -31,7 +31,7 @@ class WebInstrument extends React.Component {
     }
     this.state = {notesGrid: initialNotesGrid, overtonesAmount: 10, overtonesArray: initialOvertoneGainArray,
         attack: 10, decay: 20, sustain: 50, release: 30, detuneValue: 0, lfmFrequency: 5, lfmAmplitude: 2,
-        context: null, timer: null};
+        context: null, timer: null, playing: false};
     this.handePianoRollChange = this.handePianoRollChange.bind(this);
     this.handleAttackChange = this.handleAttackChange.bind(this);
     this.handleDecayChange = this.handleDecayChange.bind(this);
@@ -59,18 +59,18 @@ class WebInstrument extends React.Component {
   startPlaying() {
     var tempo = 120.0;
     var secondsPerBeat = 60.0 / tempo;
-    if (!this.state.timer) {
+    if (!this.state.playing) {
       this.playMelody(secondsPerBeat);
       var playMelody = this.playMelody;
-      this.setState({timer: setInterval(function() {
+      this.setState({playing: true, timer: setInterval(function() {
         playMelody(secondsPerBeat)
-      }, 0.25 * secondsPerBeat * numberOfBeats * 1000)});
+      }, 0.25 * secondsPerBeat * numberOfBeats * 1000),});
     }
   }
   stopPlaying() {
-    if (this.state.timer) {
+    if (this.state.playing) {
       clearInterval(this.state.timer);
-      this.setState({timer: null});
+      this.setState({playing: false});
     }
   }
   readyContext() {
