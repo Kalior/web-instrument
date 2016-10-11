@@ -5,7 +5,7 @@ import PianoRollContainer from './pianoRoll.js'
 import OverToneSlidersContainer from './overtoneSliders.js'
 import LowFrequencyModulationContainer from './lowFrequencyModulation.jsx'
 
-var toneFreqs = [493.88, 466.16, 440.00, 415.30, 391.995, 369.99, 349.23, 329.628, 311.13, 293.66, 277.18, 261.63];
+var toneFreqs = [493.88/2, 466.16/2, 440.00/2, 415.30/2, 391.995/2, 369.99/2, 349.23/2, 329.628/2, 311.13/2, 293.66/2, 277.18/2, 261.63/2];
 
 class WebInstrument extends React.Component {
   constructor(props) {
@@ -38,12 +38,13 @@ class WebInstrument extends React.Component {
     this.playMelody = this.playMelody.bind(this);
     this.playSound = this.playSound.bind(this);
     this.toneLength = this.toneLength.bind(this);
-    this.createOscilator = this.createOscilator.bind(this);
+    this.createSource = this.createSource.bind(this);
     this.createEnvelope = this.createEnvelope.bind(this);
     this.createLFM = this.createLFM.bind(this);
     this.startPlaying = this.startPlaying.bind(this);
     this.stopPlaying = this.stopPlaying.bind(this);
     this.readyContext = this.readyContext.bind(this);
+    this.createLimiter = this.createLimiter.bind(this);
   }
   componentDidMount() {
     this.readyContext();
@@ -120,36 +121,35 @@ class WebInstrument extends React.Component {
     );
   }
   playMelody(secondsPerBeat) {
+    var limiter = this.createLimiter();
+
     for (var i = 0; i < this.state.numberOfTones; i++) {
       for (var j = 0; j < this.state.numberOfBeats; j++) {
         if (j > 0) {
           if (this.state.notesGrid[i][j] && !this.state.notesGrid[i][j-1]) {
-            this.playSound(toneFreqs[i], this.state.context.currentTime + 0.25 * j * secondsPerBeat, 0.25 * secondsPerBeat * this.toneLength(i, j));
+            this.playSound(toneFreqs[i], this.state.context.currentTime + 0.25 * j * secondsPerBeat, 0.25 * secondsPerBeat * this.toneLength(i, j), limiter);
           }
         }
         else if (this.state.notesGrid[i][j]) {
-          this.playSound(toneFreqs[i], this.state.context.currentTime + 0.25 * j * secondsPerBeat, 0.25 * secondsPerBeat * this.toneLength(i, j));
+          this.playSound(toneFreqs[i], this.state.context.currentTime + 0.25 * j * secondsPerBeat, 0.25 * secondsPerBeat * this.toneLength(i, j), limiter);
         }
       }
     }
   }
-  playSound(freq, startTime, length) {
-    var envelopeAttack = length * this.state.attack / 100;
-    var envelopeDecay = length * this.state.decay / 100;
-    var envelopeRelease = length * this.state.release / 100;
-    var envelopeSustainTime = length - envelopeAttack - envelopeDecay - envelopeRelease;
-    var envelopeSustainGain = this.state.sustain / 100;
-
+  playSound(freq, startTime, length, limiter) {
     var gainSum = 0;
     for (var i = 0; i <= this.state.overtonesAmount; i++) {
       gainSum += this.state.overtonesArray[i] / 100;
     }
 
     var lfm = this.createLFM();
+    var envelope = this.createEnvelope(1, startTime, length);
 
     for (var i = 0; i < this.state.overtonesAmount; i++) {
-      this.createOscilator(lfm, freq * (i+1), this.state.overtonesArray[i] / (100 * gainSum), startTime,
-        length, envelopeAttack, envelopeDecay, envelopeSustainTime, envelopeRelease, envelopeSustainGain);
+      var source = this.createSource(this.state.overtonesArray[i] / (100 * gainSum * 2), freq * (i+1), startTime, length);
+      lfm.connect(source.oscillator.frequency);
+      source.gain.connect(envelope);
+      envelope.connect(limiter);
     }
   }
   toneLength(row, column) {
@@ -159,34 +159,41 @@ class WebInstrument extends React.Component {
       return 0;
     }
   }
-  createOscilator(lfm, freq, gain, startTime, length, attack, decay, sustain, release, envelopeSustainGain) {
-    // Gain should be limited so the channel does not distort. Setting to one tenth of the value for now.
-    gain = gain / 10;
-
+  createSource(gain, freq, startTime, length) {
     var oscillator = this.state.context.createOscillator();
-    oscillator.frequency.value = freq;
-    var envelope = this.createEnvelope(gain, startTime, attack, decay, sustain, release, envelopeSustainGain);
+    var gainNode = this.state.context.createGain();
 
-    lfm.connect(oscillator.frequency);
-    oscillator.connect(envelope);
-    envelope.connect(this.state.context.destination);
+    gainNode.gain.value = gain;
+
+    oscillator.frequency.value = freq;
+
     oscillator.start(startTime);
     oscillator.stop(startTime + length);
+    oscillator.connect(gainNode);
+
+    return({oscillator: oscillator,
+            gain: gainNode});
   }
-  createEnvelope(gain, startTime, attack, decay, sustain, release, envelopeSustainGain) {
+  createEnvelope(gain, startTime, length) {
+    var attack = length * this.state.attack / 100;
+    var decay = length * this.state.decay / 100;
+    var release = length * this.state.release / 100;
+    var sustainTime = length - attack - decay - release;
+    var sustainGain = this.state.sustain / 100;
+
     // Setting the Envelope
     var gainNode = this.state.context.createGain();
     gainNode.gain.setValueAtTime(0.0, startTime);
     // Attack
-    gainNode.gain.linearRampToValueAtTime(+gain.toFixed(2), startTime + attack);
+    gainNode.gain.linearRampToValueAtTime(gain, startTime + attack);
     // Decay
-    gainNode.gain.setTargetAtTime(gain * envelopeSustainGain, startTime + attack, decay * 0.2);
+    gainNode.gain.setTargetAtTime(gain * sustainGain, startTime + attack, decay * 0.2);
     // Release
     var timeBeforeRelease = startTime + attack + decay;
-    if (sustain > 0) {
-      timeBeforeRelease += sustain;
+    if (sustainTime > 0) {
+      timeBeforeRelease += sustainTime;
     }
-    gainNode.gain.setTargetAtTime(0.0, timeBeforeRelease, release * 0.2);
+    gainNode.gain.setTargetAtTime(0.0, timeBeforeRelease-(length*0.1), release * 0.2);
 
     return gainNode;
   }
@@ -199,6 +206,19 @@ class WebInstrument extends React.Component {
     detuneOscillator.connect(detuneGain);
     detuneOscillator.start(0);
     return detuneGain;
+  }
+  createLimiter() {
+    var limiter = this.state.context.createDynamicsCompressor();
+
+    limiter.threshold.value = 0.0; // this is the pitfall, leave some headroom
+    limiter.knee.value = 0.0; // brute force
+    limiter.ratio.value = 20.0; // max compression
+    limiter.attack.value = 0.005; // 5ms attack
+    limiter.release.value = 0.050; // 50ms release
+
+    limiter.connect(this.state.context.destination);
+
+    return limiter;
   }
 }
 
