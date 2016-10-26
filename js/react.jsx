@@ -122,7 +122,8 @@ class WebInstrument extends React.Component {
   render() {
     return (
       <div className="WebInstrument row" id="content">
-          <PianoRollContainer onPianoRollChange={this.handePianoRollChange} initialNotesGrid={this.state.notesGrid}/>
+          <PianoRollContainer onPianoRollChange={this.handePianoRollChange} initialNotesGrid={this.state.notesGrid}
+            currentBeat={this.state.currentBeat} />
           <OverToneSlidersContainer onOvertoneAmountChange={this.handleOvertoneAmountChange}
             onOvertoneArrayChange={this.handleOvertoneArrayChange}
             initalOvertonesAmount={this.state.overtonesAmount}
