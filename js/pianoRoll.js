@@ -5,7 +5,7 @@ var pianoRollCellSize = 30;
 export default class PianoRollContainer extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {notesGrid: this.props.initialNotesGrid, mouseDownCanvas: false, adding: false};
+    this.state = {notesGrid: this.props.initialNotesGrid, mouseDownCanvas: false, adding: false, currentBeat: 0};
     this.handleCellClicked = this.handleCellClicked.bind(this);
     this.initializeCanvasEvents = this.initializeCanvasEvents.bind(this);
     this.handleMouseMove = this.handleMouseMove.bind(this);
@@ -17,6 +17,12 @@ export default class PianoRollContainer extends React.Component {
   componentDidMount() {
     this.initializeCanvasEvents();
     this.drawCanvas();
+  }
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.currentBeat != this.state.currentBeat) {
+      this.setState({currentBeat: nextProps.currentBeat});
+      this.drawCanvas();
+    }
   }
   handleCellClicked(value, row, column) {
     var newNotesGrid = this.state.notesGrid;
@@ -46,11 +52,17 @@ export default class PianoRollContainer extends React.Component {
     for (var i = 0; i < 12; i++) {
       for (var j = 0; j < 16; j++) {
         roundRect(context, pianoRollCellSize*i, pianoRollCellSize*j, pianoRollCellSize, pianoRollCellSize, 5);
+        var greenColor ='rgb(58, 219, 118)';
+        var whiteColor = 'white';
+        if (j == this.state.currentBeat) {
+          greenColor ='rgb(22, 169, 108)';
+          whiteColor = 'rgb(225, 225, 225)';
+        }
         if (this.state.notesGrid[i][j]) {
-          context.fillStyle = 'rgb(58, 219, 118)';
+          context.fillStyle = greenColor;
         }
         else {
-          context.fillStyle = 'white';
+          context.fillStyle = whiteColor;
         }
         context.fill();
         context.lineWidth = 1;
