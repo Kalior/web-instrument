@@ -233,6 +233,9 @@ class WebInstrument extends React.Component {
 
     return limiter;
   }
+  componentWillUnmount() {
+    this.state.playWorker.terminate();
+  }
 }
 
 render(
