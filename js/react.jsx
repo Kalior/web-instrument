@@ -23,9 +23,6 @@ class WebInstrument extends React.Component {
         initialNotesGrid[i][j] = false;
       }
     }
-    this.state = {notesGrid: initialNotesGrid, overtonesAmount: 10, overtonesArray: initialOvertoneGainArray,
-        attack: 10, decay: 20, sustain: 50, release: 30, detuneValue: 0, lfmFrequency: 5, lfmAmplitude: 2,
-        context: null, timer: null, playing: false, numberOfBeats: 16, numberOfTones: 12};
     this.handePianoRollChange = this.handePianoRollChange.bind(this);
     this.handleAttackChange = this.handleAttackChange.bind(this);
     this.handleDecayChange = this.handleDecayChange.bind(this);
@@ -35,7 +32,6 @@ class WebInstrument extends React.Component {
     this.handleOvertoneArrayChange = this.handleOvertoneArrayChange.bind(this);
     this.handleLFMFrequencyChange = this.handleLFMFrequencyChange.bind(this);
     this.handleLFMAmplitudeChange = this.handleLFMAmplitudeChange.bind(this);
-    this.playMelody = this.playMelody.bind(this);
     this.playSound = this.playSound.bind(this);
     this.toneLength = this.toneLength.bind(this);
     this.createSource = this.createSource.bind(this);
@@ -45,29 +41,44 @@ class WebInstrument extends React.Component {
     this.stopPlaying = this.stopPlaying.bind(this);
     this.readyContext = this.readyContext.bind(this);
     this.createLimiter = this.createLimiter.bind(this);
+    this.playMelodyBeat = this.playMelodyBeat.bind(this);
+    this.onPlayWorkerMessage = this.onPlayWorkerMessage.bind(this);
+
+    var initialPlayWorker = new Worker("js/playWorker.js");
+    initialPlayWorker.onmessage = this.onPlayWorkerMessage;
+
+    this.state = {notesGrid: initialNotesGrid, overtonesAmount: 10, overtonesArray: initialOvertoneGainArray,
+        attack: 10, decay: 20, sustain: 50, release: 30, detuneValue: 0, lfmFrequency: 5, lfmAmplitude: 2,
+        context: null, playWorker: initialPlayWorker, playing: false, numberOfBeats: 16, numberOfTones: 12,
+        currentBeat: 0, limiter: null};
   }
   componentDidMount() {
     this.readyContext();
     $("#play-sound").click(this.startPlaying);
     $("#stop-sound").click(this.stopPlaying);
   }
+  onPlayWorkerMessage(e) {
+    var tempo = 120.0;
+    var secondsPerBeat = 60.0 / tempo;
+    this.setState({currentBeat: e.data});
+    this.playMelodyBeat(secondsPerBeat, this.state.limiter);
+  }
   startPlaying() {
     var tempo = 120.0;
     var secondsPerBeat = 60.0 / tempo;
     if (!this.state.playing) {
-      this.playMelody(secondsPerBeat);
-      var playMelody = this.playMelody;
+      var playMelodyBeat = this.playMelodyBeat;
       this.setState({
         playing: true,
-        timer: setInterval(function() {
-          playMelody(secondsPerBeat)
-        }, 0.25 * secondsPerBeat * this.state.numberOfBeats * 1000)
+        currentBeat: 0,
+        limiter: this.createLimiter()
       });
+      this.state.playWorker.postMessage([true, secondsPerBeat, this.state.numberOfBeats]);
     }
   }
   stopPlaying() {
     if (this.state.playing) {
-      clearInterval(this.state.timer);
+      this.state.playWorker.postMessage([false]);
       this.setState({playing: false});
     }
   }
@@ -112,27 +123,28 @@ class WebInstrument extends React.Component {
     return (
       <div className="WebInstrument row" id="content">
           <PianoRollContainer onPianoRollChange={this.handePianoRollChange} initialNotesGrid={this.state.notesGrid}/>
-          <OverToneSlidersContainer onOvertoneAmountChange={this.handleOvertoneAmountChange} onOvertoneArrayChange={this.handleOvertoneArrayChange}
-            initalOvertonesAmount={this.state.overtonesAmount} initialOvertoneGainArray={this.state.overtonesArray}/>
+          <OverToneSlidersContainer onOvertoneAmountChange={this.handleOvertoneAmountChange}
+            onOvertoneArrayChange={this.handleOvertoneArrayChange}
+            initalOvertonesAmount={this.state.overtonesAmount}
+            initialOvertoneGainArray={this.state.overtonesArray}/>
           <EnvelopeContainer onAttackChange={this.handleAttackChange} onDecayChange={this.handleDecayChange}
             onReleaseChange={this.handleReleaseChange} onSustainChange={this.handleSustainChange}/>
-          <LowFrequencyModulationContainer onFrequencyChange={this.handleLFMFrequencyChange} onAmplitudeChange={this.handleLFMAmplitudeChange} />
+          <LowFrequencyModulationContainer onFrequencyChange={this.handleLFMFrequencyChange}
+            onAmplitudeChange={this.handleLFMAmplitudeChange} />
       </div>
     );
   }
-  playMelody(secondsPerBeat) {
-    var limiter = this.createLimiter();
-
+  playMelodyBeat(secondsPerBeat, limiter) {
     for (var i = 0; i < this.state.numberOfTones; i++) {
-      for (var j = 0; j < this.state.numberOfBeats; j++) {
-        if (j > 0) {
-          if (this.state.notesGrid[i][j] && !this.state.notesGrid[i][j-1]) {
-            this.playSound(toneFreqs[i], this.state.context.currentTime + 0.25 * j * secondsPerBeat, 0.25 * secondsPerBeat * this.toneLength(i, j), limiter);
-          }
+      if (this.state.currentBeat > 0) {
+        if (this.state.notesGrid[i][this.state.currentBeat] && !this.state.notesGrid[i][this.state.currentBeat-1]) {
+          this.playSound(toneFreqs[i], this.state.context.currentTime,
+            0.25 * secondsPerBeat * this.toneLength(i, this.state.currentBeat), limiter);
         }
-        else if (this.state.notesGrid[i][j]) {
-          this.playSound(toneFreqs[i], this.state.context.currentTime + 0.25 * j * secondsPerBeat, 0.25 * secondsPerBeat * this.toneLength(i, j), limiter);
-        }
+      }
+      else if (this.state.notesGrid[i][this.state.currentBeat]) {
+        this.playSound(toneFreqs[i], this.state.context.currentTime,
+          0.25 * secondsPerBeat * this.toneLength(i, this.state.currentBeat), limiter);
       }
     }
   }
