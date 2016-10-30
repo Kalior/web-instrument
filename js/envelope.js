@@ -87,7 +87,7 @@ export default class EnvelopeContainer extends React.Component {
   }
   render() {
     return(
-      <div className="container column small-centered small-8 last-element">
+      <div className="container column small-6">
         <b>Envelope</b>
         <div id="envelope-container">
           <canvas id="envelope-graph" height={200} width={800}/>

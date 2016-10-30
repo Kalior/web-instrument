@@ -28,7 +28,7 @@ export default class OverToneSlidersContainer extends React.Component {
           marks={{0: '0%', 100: '100 %'}} />);
     }
     return(
-      <div className="OvertToneSlidersContainer container column small-centered small-8">
+      <div className="OvertToneSlidersContainer container column small-6">
         <b>Amount of overtones</b>
         <OverTonesAmountSlider onOvertoneChange={this.onOvertoneAmountChange}/>
         <b>Overtones</b>

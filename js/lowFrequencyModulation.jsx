@@ -18,7 +18,7 @@ export default class LowFrequencyModulationContainer extends React.Component {
   }
   render() {
     return(
-      <div className="container column small-centered small-8">
+      <div className="container column small-6">
         <b>Low frequency modulation</b>
         <br></br>
         <b>Frequency of modulation</b>
