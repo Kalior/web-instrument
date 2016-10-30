@@ -25,13 +25,14 @@ export default class OverToneSlidersContainer extends React.Component {
         <Rcslider id={'gain-control-' + i} className={"overtone-slider"}
           min={0} max={100} defaultValue={this.state.overtoneGainArray[i]} key={i}
           onAfterChange={this.onGainChange.bind(this, i)}
-          marks={{0: '0%', 100: '100 %'}} />);
+          marks={{0: '', 100: ''}} />);
     }
     return(
-      <div className="OvertToneSlidersContainer container column small-centered small-8">
-        <b>Amount of overtones</b>
+      <div className="OvertToneSlidersContainer container column small-12 medium-6">
+        <h4>Overtones</h4>
+        <b>Amount</b>
         <OverTonesAmountSlider onOvertoneChange={this.onOvertoneAmountChange}/>
-        <b>Overtones</b>
+        <b>Controls</b>
         {overtoneSliders}
       </div>
     );
