@@ -121,8 +121,8 @@ export default class PianoRollContainer extends React.Component {
   }
   render() {
     return (
-      <div className="PianoRollContainer container column small-6">
-        <b>Melody</b>
+      <div className="PianoRollContainer container column small-12 medium-6">
+        <h4>Melody</h4>
         <div>
           <canvas id="piano-roll-canvas" width={12*pianoRollCellSize+4} height={16*pianoRollCellSize+4}/>
         </div>

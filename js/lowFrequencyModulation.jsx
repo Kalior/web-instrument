@@ -18,9 +18,8 @@ export default class LowFrequencyModulationContainer extends React.Component {
   }
   render() {
     return(
-      <div className="container column small-6">
-        <b>Low frequency modulation</b>
-        <br></br>
+      <div className="container column small-12 medium-6">
+        <h4>Low frequency modulation</h4>
         <b>Frequency of modulation</b>
         <Rcslider min={0} max={20} defaultValue={this.state.frequency} step={0.1} marks={{0: '0 hz', 20: '20 hz'}}
           onAfterChange={this.onFrequencyChange}/>
