@@ -182,7 +182,7 @@ class WebInstrument extends React.Component {
   }
   toneLength (row, column) {
     if (this.state.notesGrid[row][column]) {
-      return 1 + this.toneLength(row, column+1)
+      return 1 + this.toneLength(row, column + 1)
     } else {
       return 0
     }
