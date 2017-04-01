@@ -14,7 +14,8 @@
     "start": "gulp",
     "build": "gulp sass",
     "dev": "webpack -d --watch",
-    "jsbuild": "webpack -p"
+    "jsbuild": "webpack -p",
+    "watch": "npm run start & npm run dev"
   },
   "author": "Joel Gustafsson <kalioragus@gmail.com>",
   "private": true,
