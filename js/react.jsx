@@ -196,7 +196,7 @@ class WebInstrument extends React.Component {
     oscillator.frequency.value = freq
 
     oscillator.start(startTime)
-    oscillator.stop(startTime + length)
+    oscillator.stop(startTime + length + 0.1)
     oscillator.connect(gainNode)
 
     return ({
@@ -223,7 +223,9 @@ class WebInstrument extends React.Component {
     if (sustainTime > 0) {
       timeBeforeRelease += sustainTime
     }
-    gainNode.gain.setTargetAtTime(0.0, timeBeforeRelease - (length * 0.1), release * 0.2)
+
+    // Make sure the note does not clip
+    gainNode.gain.linearRampToValueAtTime(0.0, startTime + length + 0.1)
 
     return gainNode
   }
