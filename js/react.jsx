@@ -210,18 +210,24 @@ class WebInstrument extends React.Component {
     var release = this.state.release / 100
     var sustainTime = length - attack - decay - release
     var sustainGain = this.state.sustain / 100
-
     // Setting the Envelope
     var gainNode = this.state.context.createGain()
     gainNode.gain.setValueAtTime(0.0, startTime)
-    // Attack
-    gainNode.gain.linearRampToValueAtTime(gain, startTime + attack)
-    // Decay
-    gainNode.gain.setTargetAtTime(gain * sustainGain, startTime + attack, decay * 0.2)
-    // Release
-    var timeBeforeRelease = startTime + attack + decay
-    if (sustainTime > 0) {
-      timeBeforeRelease += sustainTime
+
+    if (length > attack) {
+      // Attack
+      gainNode.gain.linearRampToValueAtTime(gain, startTime + attack)
+      // Decay
+      gainNode.gain.setTargetAtTime(gain * sustainGain, startTime + attack, decay * 0.2)
+      // Release
+      var timeBeforeRelease = startTime + attack + decay + Math.max(0, sustainTime)
+
+      gainNode.gain.setTargetAtTime(0.0, timeBeforeRelease, release * 0.2)
+    } else {
+      // If the attack is longer than the length of the note, we only have
+      // time for a part of the attack.
+      // Attack
+      gainNode.gain.linearRampToValueAtTime(gain * length / attack, startTime + length)
     }
 
     // Make sure the note does not clip
