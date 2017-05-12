@@ -1,0 +1,54 @@
+.piano-roll-container {
+  display: flex;
+  flex-flow: column nowrap;
+
+  .piano-roll {
+    display: flex;
+
+    .piano-roll-column {
+      display: flex;
+      flex-flow: row wrap;
+    }
+    .piano-roll-element {
+      cursor: pointer;
+      flex-grow: 1;
+      width: 30px;
+      height: 30px;
+      box-shadow: 0 0px 1px rgba(0, 0, 0, 0.6);
+    }
+    .selected {
+      background-color: rgba(0, 200, 0, 0.6);
+    }
+
+    .current-beat {
+      background-color: rgba(0, 0, 0, 0.4);
+    }
+
+    .current-beat.selected {
+      background-color: rgba(0, 150, 0, 0.4);
+    }
+  }
+
+  .piano {
+    display: flex;
+
+    .white-key {
+      background: #FFF;
+    }
+
+    .black-key {
+      background: #000;
+    }
+
+    .piano-key {
+      cursor: pointer;
+      width: 30px;
+      height: 30px;
+      box-shadow: 0 0px 1px rgba(0, 0, 0, 0.6);
+    }
+    .selected {
+      background-color: rgba(0, 200, 0, 0.6);
+    }
+  }
+
+}
