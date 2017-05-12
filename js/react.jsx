@@ -5,10 +5,13 @@ import PianoRollContainer from './pianoRoll.js'
 import OverToneSlidersContainer from './overtoneSliders.js'
 import LowFrequencyModulationContainer from './lowFrequencyModulation.jsx'
 
-var toneFreqs = [493.88/2, 466.16/2, 440.00/2, 415.30/2, 391.995/2, 369.99/2, 349.23/2, 329.628/2, 311.13/2, 293.66/2, 277.18/2, 261.63/2]
+var baseFrequency = 440.00
+var frequencyStepMultiplier = 1.059475078256682
+
+var toneFreqs = [2, 1, 0, -1, -2, -3, -4, -5, -6, -7, -8, -9]
 
 class WebInstrument extends React.Component {
-  constructor(props) {
+  constructor (props) {
     super(props)
     var initialOvertoneGainArray = []
     for (var i = 0; i <= 25; i++) {
@@ -43,6 +46,7 @@ class WebInstrument extends React.Component {
     this.createLimiter = this.createLimiter.bind(this)
     this.playMelodyBeat = this.playMelodyBeat.bind(this)
     this.onPlayWorkerMessage = this.onPlayWorkerMessage.bind(this)
+    this.handleFrequencyMultipliersChange = this.handleFrequencyMultipliersChange.bind(this)
 
     var initialPlayWorker = new Worker("js/playWorker.js")
     initialPlayWorker.onmessage = this.onPlayWorkerMessage
@@ -62,9 +66,9 @@ class WebInstrument extends React.Component {
       playWorker: initialPlayWorker,
       playing: false,
       numberOfBeats: 16,
-      numberOfTones: 12,
       currentBeat: 0,
-      limiter: null
+      limiter: null,
+      frequencyMultipliers: toneFreqs
     }
   }
   componentDidMount () {
@@ -82,7 +86,6 @@ class WebInstrument extends React.Component {
     var tempo = 120.0
     var secondsPerBeat = 60.0 / tempo
     if (!this.state.playing) {
-      var playMelodyBeat = this.playMelodyBeat
       this.setState({
         playing: true,
         currentBeat: 0,
@@ -133,34 +136,46 @@ class WebInstrument extends React.Component {
   handleLFMAmplitudeChange (newAmplitude) {
     this.setState({lfmAmplitude: newAmplitude})
   }
+  handleFrequencyMultipliersChange (newFrequencyMultipliers) {
+    this.setState({frequencyMultipliers: newFrequencyMultipliers})
+  }
 
   render () {
     return (
-      <div className="WebInstrument row" id="content">
-          <OverToneSlidersContainer onOvertoneAmountChange={this.handleOvertoneAmountChange}
-            onOvertoneArrayChange={this.handleOvertoneArrayChange}
-            initalOvertonesAmount={this.state.overtonesAmount}
-            initialOvertoneGainArray={this.state.overtonesArray}/>
-          <PianoRollContainer onPianoRollChange={this.handePianoRollChange} initialNotesGrid={this.state.notesGrid}
-            currentBeat={this.state.currentBeat} />
-          <EnvelopeContainer onAttackChange={this.handleAttackChange} onDecayChange={this.handleDecayChange}
-            onReleaseChange={this.handleReleaseChange} onSustainChange={this.handleSustainChange}/>
-          <LowFrequencyModulationContainer onFrequencyChange={this.handleLFMFrequencyChange}
-            onAmplitudeChange={this.handleLFMAmplitudeChange} />
+      <div className='WebInstrument row' id='content'>
+        <OverToneSlidersContainer onOvertoneAmountChange={this.handleOvertoneAmountChange}
+          onOvertoneArrayChange={this.handleOvertoneArrayChange}
+          initalOvertonesAmount={this.state.overtonesAmount}
+          initialOvertoneGainArray={this.state.overtonesArray} />
+        <PianoRollContainer onPianoRollChange={this.handePianoRollChange} initialNotesGrid={this.state.notesGrid}
+          currentBeat={this.state.currentBeat} frequencyMultipliers={this.state.frequencyMultipliers}
+          onFrequencyMultipliersChange={this.handleFrequencyMultipliersChange} />
+        <EnvelopeContainer onAttackChange={this.handleAttackChange} onDecayChange={this.handleDecayChange}
+          onReleaseChange={this.handleReleaseChange} onSustainChange={this.handleSustainChange} />
+        <LowFrequencyModulationContainer onFrequencyChange={this.handleLFMFrequencyChange}
+          onAmplitudeChange={this.handleLFMAmplitudeChange} />
       </div>
     )
   }
   playMelodyBeat (secondsPerBeat, limiter) {
-    for (var i = 0; i < this.state.numberOfTones; i++) {
+    for (var i = 0; i < this.state.frequencyMultipliers.length; i++) {
       if (this.state.currentBeat > 0) {
-        if (this.state.notesGrid[i][this.state.currentBeat] && !this.state.notesGrid[i][this.state.currentBeat-1]) {
-          this.playSound(toneFreqs[i], this.state.context.currentTime,
-            0.25 * secondsPerBeat * this.toneLength(i, this.state.currentBeat), limiter)
+        if (this.state.notesGrid[i][this.state.currentBeat] && !this.state.notesGrid[i][this.state.currentBeat - 1]) {
+          this.playSound(
+            baseFrequency * Math.pow(frequencyStepMultiplier, this.state.frequencyMultipliers[i]),
+            this.state.context.currentTime,
+            0.25 * secondsPerBeat * this.toneLength(i, this.state.currentBeat),
+            limiter
+          )
         }
       }
       else if (this.state.notesGrid[i][this.state.currentBeat]) {
-        this.playSound(toneFreqs[i], this.state.context.currentTime,
-          0.25 * secondsPerBeat * this.toneLength(i, this.state.currentBeat), limiter)
+        this.playSound(
+          baseFrequency * Math.pow(frequencyStepMultiplier, this.state.frequencyMultipliers[i]),
+          this.state.context.currentTime,
+          0.25 * secondsPerBeat * this.toneLength(i, this.state.currentBeat),
+          limiter
+        )
       }
     }
   }

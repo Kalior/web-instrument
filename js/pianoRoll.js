@@ -1,154 +1,145 @@
 import React from 'react'
-
-var pianoRollCellSize = 30 * 2
+import _ from 'lodash'
 
 export default class PianoRollContainer extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      notesGrid: this.props.initialNotesGrid,
-      mouseDownCanvas: false,
+      notesGrid: props.initialNotesGrid,
+      mouseDown: false,
       adding: false,
-      currentBeat: 0,
-      currentNotes: 12
+      frequencyMultipliers: props.frequencyMultipliers
     }
-    this.handleCellClicked = this.handleCellClicked.bind(this)
-    this.initializeCanvasEvents = this.initializeCanvasEvents.bind(this)
-    this.handleMouseMove = this.handleMouseMove.bind(this)
-    this.drawCanvas = this.drawCanvas.bind(this)
     this.handleMouseUp = this.handleMouseUp.bind(this)
-    this.handleMouseDown = this.handleMouseDown.bind(this)
-    this.handleMouseClick = this.handleMouseClick.bind(this)
-    this.getMouseGridCoordinates = this.getMouseGridCoordinates.bind(this)
-  }
-  componentDidMount () {
-    this.initializeCanvasEvents()
-    this.drawCanvas()
-  }
-  componentWillReceiveProps (nextProps) {
-    if (nextProps.currentBeat !== this.state.currentBeat) {
-      this.setState({currentBeat: nextProps.currentBeat})
-      this.drawCanvas()
-    }
-  }
-  handleCellClicked (value, row, column) {
-    var newNotesGrid = this.state.notesGrid
-    newNotesGrid[row][column] = value
-    this.setState({notesGrid: newNotesGrid})
-    this.props.onPianoRollChange(newNotesGrid)
+    this.handlePianoClick = this.handlePianoClick.bind(this)
+    this.handlePianoRollClick = this.handlePianoRollClick.bind(this)
+    this.handlePianoRollEnter = this.handlePianoRollEnter.bind(this)
+    this.handlePianoEnter = this.handlePianoEnter.bind(this)
+    this.handlePianoUp = this.handlePianoUp.bind(this)
   }
   handleMouseUp () {
     this.setState({mouseDownCanvas: false})
   }
-  handleMouseDown (event) {
-    var canvas = document.getElementById('piano-roll-canvas')
-    this.setState({mouseDownCanvas: true})
-    var mousePos = this.getMouseGridCoordinates(canvas, event)
-    if (!this.state.notesGrid[mousePos.row][mousePos.column]) {
-      this.setState({adding: true})
+  handlePianoRollClick (i, j, event) {
+    event.preventDefault()
+    $(event.target).toggleClass('selected')
+
+    let newNotesGrid = this.state.notesGrid
+    let isAdding = !newNotesGrid[i][j]
+    newNotesGrid[i][j] = isAdding
+    this.setState({
+      notesGrid: newNotesGrid,
+      adding: isAdding,
+      mouseDown: true
+    })
+    this.props.onPianoRollChange(newNotesGrid)
+  }
+  handlePianoRollEnter (i, j, event) {
+    if (this.state.mouseDown) {
+      let newNotesGrid = this.state.notesGrid
+      if (this.state.adding && !newNotesGrid[i][j]) {
+        $(event.target).toggleClass('selected')
+        newNotesGrid[i][j] = !newNotesGrid[i][j]
+      } else if (!this.state.adding && newNotesGrid[i][j]) {
+        $(event.target).toggleClass('selected')
+        newNotesGrid[i][j] = !newNotesGrid[i][j]
+      }
+      this.setState({notesGrid: newNotesGrid})
+      this.props.onPianoRollChange(newNotesGrid)
+    }
+  }
+  handlePianoEnter (index, event) {
+    let frequencyMultipliers = this.state.frequencyMultipliers
+    if (this.state.mouseDown) {
+      if (this.state.adding && !_.includes(frequencyMultipliers, index)) {
+        $(event.target).addClass('selected')
+        // Reverse because lodash expects a certain ordering.
+        frequencyMultipliers = _.reverse(frequencyMultipliers)
+        frequencyMultipliers.splice(_.sortedIndex(frequencyMultipliers, index), 0, index)
+        _.reverse(frequencyMultipliers)
+      } else if (!this.state.adding && _.includes(frequencyMultipliers, index)) {
+        $(event.target).removeClass('selected')
+        _.pull(frequencyMultipliers, index)
+      }
+
+      this.setState({frequencyMultipliers: frequencyMultipliers})
+      this.props.onFrequencyMultipliersChange(frequencyMultipliers)
+    }
+  }
+  handlePianoUp (event) {
+    this.setState({mouseDown: false})
+  }
+  handlePianoClick (index, event) {
+    event.preventDefault()
+    $(event.target).toggleClass('selected')
+    let isAdding = false
+    // Reverse because lodash expects a certain ordering.
+    let frequencyMultipliers = _.reverse(this.state.frequencyMultipliers)
+    if (_.includes(frequencyMultipliers, index)) {
+      _.pull(frequencyMultipliers, index)
+      isAdding = false
     } else {
-      this.setState({adding: false})
+      frequencyMultipliers.splice(_.sortedIndex(frequencyMultipliers, index), 0, index)
+      isAdding = true
     }
-  }
-  drawCanvas () {
-    var canvas = document.getElementById('piano-roll-canvas')
-    var context = canvas.getContext('2d')
-    context.clearRect(0, 0, canvas.width, canvas.height)
-    context.beginPath()
-    for (var i = 0; i < this.state.currentNotes; i++) {
-      for (var j = 0; j < 16; j++) {
-        roundRect(context, pianoRollCellSize * i, pianoRollCellSize * j, pianoRollCellSize, pianoRollCellSize, 5)
-        var greenColor = 'rgb(58, 219, 118)'
-        var whiteColor = 'white'
-        if (j === this.state.currentBeat) {
-          greenColor = 'rgb(22, 169, 108)'
-          whiteColor = 'rgb(225, 225, 225)'
-        }
-        if (this.state.notesGrid[i][j]) {
-          context.fillStyle = greenColor
-        } else {
-          context.fillStyle = whiteColor
-        }
-        context.fill()
-        context.lineWidth = 1
-        context.strokeStyle = 'black'
-        context.stroke()
-      }
-    }
-  }
-  initializeCanvasEvents () {
-    var canvas = document.getElementById('piano-roll-canvas')
-    // Bunch of event handlers for when mouse is down, up, moves, and preventing selection.
-    canvas.addEventListener('mousemove', this.handleMouseMove, false)
-    canvas.addEventListener('mousedown', this.handleMouseDown, false)
-    canvas.addEventListener('mouseup', this.handleMouseUp, false)
-    canvas.addEventListener('mouseout', this.handleMouseUp, false)
-    canvas.addEventListener('click', this.handleMouseClick, false)
-    // do nothing in the event handler except canceling the event
-    canvas.ondragstart = function (e) {
-      if (e && e.preventDefault) { e.preventDefault() }
-      if (e && e.stopPropagation) { e.stopPropagation() }
-      return false
-    }
-    // do nothing in the event handler except canceling the event
-    canvas.onselectstart = function (e) {
-      if (e && e.preventDefault) { e.preventDefault() }
-      if (e && e.stopPropagation) { e.stopPropagation() }
-      return false
-    }
-  }
-  handleMouseMove (event) {
-    event.preventDefault()
-    if (this.state.mouseDownCanvas) {
-      var canvas = document.getElementById('piano-roll-canvas')
-      var mousePos = this.getMouseGridCoordinates(canvas, event)
-      if (!this.state.notesGrid[mousePos.row][mousePos.column] && this.state.adding) {
-        this.handleCellClicked(true, mousePos.row, mousePos.column)
-        this.drawCanvas()
-      } else if (this.state.notesGrid[mousePos.row][mousePos.column] && !this.state.adding) {
-        this.handleCellClicked(false, mousePos.row, mousePos.column)
-        this.drawCanvas()
-      }
-    }
-  }
-  handleMouseClick (event) {
-    event.preventDefault()
-    var canvas = document.getElementById('piano-roll-canvas')
-    var mousePos = this.getMouseGridCoordinates(canvas, event)
-    if (!this.state.notesGrid[mousePos.row][mousePos.column] && this.state.adding) {
-      this.handleCellClicked(true, mousePos.row, mousePos.column)
-    } else if (!this.state.adding) {
-      this.handleCellClicked(false, mousePos.row, mousePos.column)
-    }
-    this.drawCanvas()
-  }
-  getMouseGridCoordinates (canvas, event) {
-    var rect = canvas.getBoundingClientRect()
-    return {row: Math.floor((event.clientX - rect.left) / (canvas.scrollWidth / this.state.currentNotes)),
-      column: Math.floor((event.clientY - rect.top) / (canvas.scrollHeight / 16))}
+    _.reverse(frequencyMultipliers)
+
+    this.setState({
+      frequencyMultipliers: frequencyMultipliers,
+      adding: isAdding,
+      mouseDown: true
+    })
+    this.props.onFrequencyMultipliersChange(frequencyMultipliers)
   }
   render () {
+    let piano = []
+    for (let i = 24; i > 0; i--) {
+      let classes = 'piano-key white-key'
+      if (_.includes(this.state.frequencyMultipliers, i - 22)) {
+        classes += ' selected'
+      }
+      piano.push(<div
+        className={classes}
+        id={'piano-key-' + i}
+        key={i}
+        onMouseDown={this.handlePianoClick.bind(this, i - 22)}
+        onMouseEnter={this.handlePianoEnter.bind(this, i - 22)}
+        />)
+    }
+    let pianoRoll = []
+    for (var i = 0; i < this.state.frequencyMultipliers.length; i++) {
+      let pianoRollColumn = []
+      for (var j = 0; j < 16; j++) {
+        let classes = 'piano-roll-element'
+        if (this.state.notesGrid[i][j]) {
+          classes += ' selected'
+        }
+        if (j === this.props.currentBeat) {
+          classes += ' current-beat'
+        }
+        pianoRollColumn.push(<div
+          className={classes}
+          key={j + (i * j)}
+          onMouseDown={this.handlePianoRollClick.bind(this, i, j)}
+          onMouseEnter={this.handlePianoRollEnter.bind(this, i, j)}
+          onMouseUp={this.handlePianoUp}
+          />)
+      }
+      pianoRoll.push(<div key={i} className='piano-roll-column'> {pianoRollColumn} </div>)
+    }
     return (
-      <div className='PianoRollContainer container column small-12 medium-6'>
+      <div
+        className='piano-roll-container container column small-12 medium-6'
+        onMouseUp={this.handlePianoUp}
+        >
         <h4>Melody</h4>
-        <canvas id='piano-roll-canvas' width={(this.state.currentNotes * pianoRollCellSize) + 4} height={(16 * pianoRollCellSize) + 4} />
+        <div className='piano-roll'>
+          {pianoRoll}
+        </div>
+        <div className='piano'>
+          {piano}
+        </div>
       </div>
     )
   }
-}
-
-// Found on stack overflow, thanks for that
-function roundRect (context, x, y, w, h, r) {
-  if (w < 2 * r) r = w / 2
-  if (h < 2 * r) r = h / 2
-  context.save()
-  context.translate(2, 2)
-  context.beginPath()
-  context.moveTo(x + r, y)
-  context.arcTo(x + w, y, x + w, y + h, r)
-  context.arcTo(x + w, y + h, x, y + h, r)
-  context.arcTo(x, y + h, x, y, r)
-  context.arcTo(x, y, x + w, y, r)
-  context.closePath()
-  context.restore()
 }
