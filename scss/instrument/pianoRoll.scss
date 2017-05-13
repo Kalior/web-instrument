@@ -4,10 +4,11 @@
 
   .piano-roll {
     display: flex;
+    flex-flow: column nowrap;
 
-    .piano-roll-column {
+    .piano-roll-row {
       display: flex;
-      flex-flow: row wrap;
+      flex-flow: row nowrap;
     }
     .piano-roll-element {
       cursor: pointer;
@@ -31,6 +32,7 @@
 
   .piano {
     display: flex;
+    margin-top: 1em;
 
     .white-key {
       background: #FFF;

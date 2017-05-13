@@ -8,7 +8,7 @@ export default class PianoRollContainer extends React.Component {
       notesGrid: props.initialNotesGrid,
       mouseDown: false,
       adding: false,
-      frequencyMultipliers: props.frequencyMultipliers
+      frequencyArray: props.frequencyArray
     }
     this.handleMouseUp = this.handleMouseUp.bind(this)
     this.handlePianoClick = this.handlePianoClick.bind(this)
@@ -49,21 +49,17 @@ export default class PianoRollContainer extends React.Component {
     }
   }
   handlePianoEnter (index, event) {
-    let frequencyMultipliers = this.state.frequencyMultipliers
     if (this.state.mouseDown) {
-      if (this.state.adding && !_.includes(frequencyMultipliers, index)) {
-        $(event.target).addClass('selected')
-        // Reverse because lodash expects a certain ordering.
-        frequencyMultipliers = _.reverse(frequencyMultipliers)
-        frequencyMultipliers.splice(_.sortedIndex(frequencyMultipliers, index), 0, index)
-        _.reverse(frequencyMultipliers)
-      } else if (!this.state.adding && _.includes(frequencyMultipliers, index)) {
-        $(event.target).removeClass('selected')
-        _.pull(frequencyMultipliers, index)
+      let newFrequencyArray = this.state.frequencyArray
+      if (this.state.adding && !newFrequencyArray[index]) {
+        $(event.target).toggleClass('selected')
+        newFrequencyArray[index] = !newFrequencyArray[index]
+      } else if (!this.state.adding && newFrequencyArray[index]) {
+        $(event.target).toggleClass('selected')
+        newFrequencyArray[index] = !newFrequencyArray[index]
       }
-
-      this.setState({frequencyMultipliers: frequencyMultipliers})
-      this.props.onFrequencyMultipliersChange(frequencyMultipliers)
+      this.setState({frequencyArray: newFrequencyArray})
+      this.props.onFrequencyArrayChange(newFrequencyArray)
     }
   }
   handlePianoUp (event) {
@@ -72,60 +68,54 @@ export default class PianoRollContainer extends React.Component {
   handlePianoClick (index, event) {
     event.preventDefault()
     $(event.target).toggleClass('selected')
-    let isAdding = false
-    // Reverse because lodash expects a certain ordering.
-    let frequencyMultipliers = _.reverse(this.state.frequencyMultipliers)
-    if (_.includes(frequencyMultipliers, index)) {
-      _.pull(frequencyMultipliers, index)
-      isAdding = false
-    } else {
-      frequencyMultipliers.splice(_.sortedIndex(frequencyMultipliers, index), 0, index)
-      isAdding = true
-    }
-    _.reverse(frequencyMultipliers)
 
+    let newFrequencyArray = this.state.frequencyArray
+    let isAdding = !newFrequencyArray[index]
+    newFrequencyArray[index] = isAdding
     this.setState({
-      frequencyMultipliers: frequencyMultipliers,
+      frequencyArray: newFrequencyArray,
       adding: isAdding,
       mouseDown: true
     })
-    this.props.onFrequencyMultipliersChange(frequencyMultipliers)
+    this.props.onFrequencyArrayChange(newFrequencyArray)
   }
   render () {
     let piano = []
-    for (let i = 24; i > 0; i--) {
+    for (let i = 0; i < this.state.frequencyArray.length - 1; i++) {
       let classes = 'piano-key white-key'
-      if (_.includes(this.state.frequencyMultipliers, i - 22)) {
+      if (this.state.frequencyArray[i]) {
         classes += ' selected'
       }
       piano.push(<div
         className={classes}
         id={'piano-key-' + i}
         key={i}
-        onMouseDown={this.handlePianoClick.bind(this, i - 22)}
-        onMouseEnter={this.handlePianoEnter.bind(this, i - 22)}
+        onMouseDown={this.handlePianoClick.bind(this, i)}
+        onMouseEnter={this.handlePianoEnter.bind(this, i)}
         />)
     }
     let pianoRoll = []
-    for (var i = 0; i < this.state.frequencyMultipliers.length; i++) {
-      let pianoRollColumn = []
-      for (var j = 0; j < 16; j++) {
-        let classes = 'piano-roll-element'
-        if (this.state.notesGrid[i][j]) {
-          classes += ' selected'
+    for (var i = 0; i < 16; i++) {
+      let pianoRollRow = []
+      for (var j = 0; j < this.state.frequencyArray.length - 1; j++) {
+        if (this.state.frequencyArray[j]) {
+          let classes = 'piano-roll-element'
+          if (this.state.notesGrid[i][j]) {
+            classes += ' selected'
+          }
+          if (i === this.props.currentBeat) {
+            classes += ' current-beat'
+          }
+          pianoRollRow.push(<div
+            className={classes}
+            key={j + (i * j)}
+            onMouseDown={this.handlePianoRollClick.bind(this, i, j)}
+            onMouseEnter={this.handlePianoRollEnter.bind(this, i, j)}
+            onMouseUp={this.handlePianoUp}
+            />)
         }
-        if (j === this.props.currentBeat) {
-          classes += ' current-beat'
-        }
-        pianoRollColumn.push(<div
-          className={classes}
-          key={j + (i * j)}
-          onMouseDown={this.handlePianoRollClick.bind(this, i, j)}
-          onMouseEnter={this.handlePianoRollEnter.bind(this, i, j)}
-          onMouseUp={this.handlePianoUp}
-          />)
       }
-      pianoRoll.push(<div key={i} className='piano-roll-column'> {pianoRollColumn} </div>)
+      pianoRoll.push(<div key={i} className='piano-roll-row'> {pianoRollRow} </div>)
     }
     return (
       <div
