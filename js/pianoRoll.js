@@ -19,13 +19,14 @@ export default class PianoRollContainer extends React.Component {
     this.handlePianoRollClick = this.handlePianoRollClick.bind(this)
     this.handlePianoRollEnter = this.handlePianoRollEnter.bind(this)
     this.handlePianoEnter = this.handlePianoEnter.bind(this)
-    this.handlePianoUp = this.handlePianoUp.bind(this)
+    this.handlePianoLeave = this.handlePianoLeave.bind(this)
   }
   handleMouseUp () {
     this.setState({mouseDownCanvas: false})
   }
   handlePianoRollClick (i, j, event) {
     event.preventDefault()
+    event.stopPropagation()
     $(event.target).toggleClass('selected')
 
     let newNotesGrid = this.state.notesGrid
@@ -66,11 +67,12 @@ export default class PianoRollContainer extends React.Component {
       this.props.onFrequencyArrayChange(newFrequencyArray)
     }
   }
-  handlePianoUp (event) {
+  handlePianoLeave (event) {
     this.setState({mouseDown: false})
   }
   handlePianoClick (index, event) {
     event.preventDefault()
+    event.stopPropagation()
     $(event.target).toggleClass('selected')
 
     let newFrequencyArray = this.state.frequencyArray
@@ -120,7 +122,7 @@ export default class PianoRollContainer extends React.Component {
             key={j + (i * j)}
             onMouseDown={this.handlePianoRollClick.bind(this, i, j)}
             onMouseEnter={this.handlePianoRollEnter.bind(this, i, j)}
-            onMouseUp={this.handlePianoUp}
+            onMouseUp={this.handlePianoLeave}
             />)
         }
       }
@@ -129,13 +131,17 @@ export default class PianoRollContainer extends React.Component {
     return (
       <div
         className='piano-roll-container container column small-12 medium-6'
-        onMouseUp={this.handlePianoUp}
+        onMouseUp={this.handlePianoLeave}
         >
         <h4>Melody</h4>
-        <div className='piano-roll'>
+        <div
+          onMouseLeave={this.handlePianoLeave}
+          className='piano-roll'>
           {pianoRoll}
         </div>
-        <div className='piano'>
+        <div
+          onMouseLeave={this.handlePianoLeave}
+          className='piano'>
           {piano}
         </div>
       </div>
