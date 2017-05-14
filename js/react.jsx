@@ -6,8 +6,8 @@ import OverToneSlidersContainer from './overtoneSliders.js'
 import LowFrequencyModulationContainer from './lowFrequencyModulation.jsx'
 
 var toneFrequencies = [
-  493.88, 466.16, 440.00, 415.30, 392.00, 369.99, 349.23, 329.63, 311.13, 293.66, 277.18, 261.63,
-  246.94, 233.08, 220.00, 207.65, 196.00, 185.00, 174.61, 164.81, 155.56, 146.83, 138.59, 130.81
+  123.47, 130.81, 138.59, 146.83, 155.56, 164.81, 174.61, 185, 196, 207.65, 220, 233.08, 246.94,
+  261.63, 277.18, 293.66, 311.13, 329.63, 349.23, 369.99, 392, 415.3, 440, 466.16, 493.88, 523.25
 ]
 
 class WebInstrument extends React.Component {
@@ -22,15 +22,21 @@ class WebInstrument extends React.Component {
     var initialNotesGrid = []
     for (var i = 0; i < 16; i++) {
       initialNotesGrid[i] = []
-      for (var j = 0; j < toneFrequencies.length; j++) {
+      for (var j = 0; j <= toneFrequencies.length; j++) {
         initialNotesGrid[i][j] = false
       }
     }
 
     let initialFrequencyArray = []
-    for (let i = 0; i < toneFrequencies.length; i++) {
-      initialFrequencyArray[i] = true
+    for (let i = 0; i <= toneFrequencies.length; i++) {
+      initialFrequencyArray[i] = false
     }
+
+    // Standard C scale
+    initialFrequencyArray[13] = initialFrequencyArray[15] = initialFrequencyArray[17] =
+      initialFrequencyArray[18] = initialFrequencyArray[20] = initialFrequencyArray[22] =
+      initialFrequencyArray[24] = initialFrequencyArray[25] = true
+
     this.handePianoRollChange = this.handePianoRollChange.bind(this)
     this.handleAttackChange = this.handleAttackChange.bind(this)
     this.handleDecayChange = this.handleDecayChange.bind(this)

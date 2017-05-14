@@ -1,8 +1,8 @@
 import React from 'react'
 
 const isWhiteArray = [
-  true, false, true, false, true, true, false, true, false, true, false, true,
-  true, false, true, false, true, true, false, true, false, true, false, true
+  true, true, false, true, false, true, true, false, true, false, true, false, true,
+  true, false, true, false, true, true, false, true, false, true, false, true, true
 ]
 
 export default class PianoRollContainer extends React.Component {
