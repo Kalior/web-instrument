@@ -27,8 +27,8 @@ class WebInstrument extends React.Component {
       }
     }
 
-    var initialFrequencyArray = []
-    for (var i = 0; i < toneFrequencies.length; i++) {
+    let initialFrequencyArray = []
+    for (let i = 0; i < toneFrequencies.length; i++) {
       initialFrequencyArray[i] = true
     }
     this.handePianoRollChange = this.handePianoRollChange.bind(this)

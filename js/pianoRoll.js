@@ -1,5 +1,9 @@
 import React from 'react'
-import _ from 'lodash'
+
+const isWhiteArray = [
+  true, false, true, false, true, true, false, true, false, true, false, true,
+  true, false, true, false, true, true, false, true, false, true, false, true
+]
 
 export default class PianoRollContainer extends React.Component {
   constructor (props) {
@@ -82,7 +86,12 @@ export default class PianoRollContainer extends React.Component {
   render () {
     let piano = []
     for (let i = 0; i < this.state.frequencyArray.length - 1; i++) {
-      let classes = 'piano-key white-key'
+      let classes = 'piano-key'
+      if (isWhiteArray[i]) {
+        classes += ' white-key'
+      } else {
+        classes += ' black-key'
+      }
       if (this.state.frequencyArray[i]) {
         classes += ' selected'
       }

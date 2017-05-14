@@ -18,7 +18,7 @@
       box-shadow: 0 0px 1px rgba(0, 0, 0, 0.6);
     }
     .selected {
-      background-color: rgba(0, 200, 0, 0.6);
+      background-color: rgba(0, 200, 0, 0.4);
     }
 
     .current-beat {
@@ -26,7 +26,7 @@
     }
 
     .current-beat.selected {
-      background-color: rgba(0, 150, 0, 0.4);
+      background-color: rgba(0, 200, 0, 0.6);
     }
   }
 
@@ -36,10 +36,12 @@
 
     .white-key {
       background: #FFF;
+      opacity: 0.4;
     }
 
     .black-key {
       background: #000;
+      opacity: 1.0;
     }
 
     .piano-key {
