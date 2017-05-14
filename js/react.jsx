@@ -84,8 +84,8 @@ class WebInstrument extends React.Component {
   }
   componentDidMount () {
     this.readyContext()
-    $("#play-sound").click(this.startPlaying)
-    $("#stop-sound").click(this.stopPlaying)
+    $('#play-sound').click(this.startPlaying)
+    $('#stop-sound').click(this.stopPlaying)
   }
   onPlayWorkerMessage (e) {
     var tempo = 120.0
