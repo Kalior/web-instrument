@@ -51,8 +51,9 @@ html {
 }
 
 #wrapper {
-  min-height:    100%;
   margin-bottom: 60px;
+  display: flex;
+  justify-content: center;
 }
 
 .larger {
