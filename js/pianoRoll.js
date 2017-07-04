@@ -14,17 +14,11 @@ export default class PianoRollContainer extends React.Component {
       adding: false,
       frequencyArray: props.frequencyArray
     }
-    this.handleMouseUp = this.handleMouseUp.bind(this)
-    this.handlePianoClick = this.handlePianoClick.bind(this)
-    this.handlePianoRollClick = this.handlePianoRollClick.bind(this)
-    this.handlePianoRollEnter = this.handlePianoRollEnter.bind(this)
-    this.handlePianoEnter = this.handlePianoEnter.bind(this)
-    this.handlePianoLeave = this.handlePianoLeave.bind(this)
   }
-  handleMouseUp () {
+  handleMouseUp = () => {
     this.setState({mouseDownCanvas: false})
   }
-  handlePianoRollClick (i, j, event) {
+  handlePianoRollClick = (i, j, event) => {
     event.preventDefault()
     event.stopPropagation()
     $(event.target).toggleClass('selected')
@@ -39,7 +33,7 @@ export default class PianoRollContainer extends React.Component {
     })
     this.props.onPianoRollChange(newNotesGrid)
   }
-  handlePianoRollEnter (i, j, event) {
+  handlePianoRollEnter = (i, j, event) => {
     if (this.state.mouseDown) {
       let newNotesGrid = this.state.notesGrid
       if (this.state.adding && !newNotesGrid[i][j]) {
@@ -53,7 +47,7 @@ export default class PianoRollContainer extends React.Component {
       this.props.onPianoRollChange(newNotesGrid)
     }
   }
-  handlePianoEnter (index, event) {
+  handlePianoEnter = (index, event) => {
     if (this.state.mouseDown) {
       let newFrequencyArray = this.state.frequencyArray
       if (this.state.adding && !newFrequencyArray[index]) {
@@ -67,10 +61,10 @@ export default class PianoRollContainer extends React.Component {
       this.props.onFrequencyArrayChange(newFrequencyArray)
     }
   }
-  handlePianoLeave (event) {
+  handlePianoLeave = (event) => {
     this.setState({mouseDown: false})
   }
-  handlePianoClick (index, event) {
+  handlePianoClick = (index, event) => {
     event.preventDefault()
     event.stopPropagation()
     $(event.target).toggleClass('selected')

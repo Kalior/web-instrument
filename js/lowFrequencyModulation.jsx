@@ -5,14 +5,12 @@ export default class LowFrequencyModulationContainer extends React.Component {
   constructor(props) {
     super(props);
     this.state = {frequency: 5, amplitude: 2};
-    this.onFrequencyChange = this.onFrequencyChange.bind(this);
-    this.onAmplitudeChange = this.onAmplitudeChange.bind(this);
   }
-  onFrequencyChange(value) {
+  onFrequencyChange = (value) => {
     this.setState({frequency: value});
     this.props.onFrequencyChange(value);
   }
-  onAmplitudeChange(value) {
+  onAmplitudeChange = (value) => {
     this.setState({amplitude: value});
     this.props.onAmplitudeChange(value);
   }

@@ -5,14 +5,12 @@ export default class OverToneSlidersContainer extends React.Component {
   constructor(props) {
     super(props);
     this.state = {amountOfOvertones: this.props.initalOvertonesAmount, overtoneGainArray: this.props.initialOvertoneGainArray};
-    this.onOvertoneAmountChange = this.onOvertoneAmountChange.bind(this);
-    this.onGainChange = this.onGainChange.bind(this);
   }
-  onOvertoneAmountChange(value) {
+  onOvertoneAmountChange = (value) => {
     this.setState({amountOfOvertones: value});
     this.props.onOvertoneAmountChange(value);
   }
-  onGainChange(overtoneIndex, gain) {
+  onGainChange = (overtoneIndex, gain) => {
     var newOvertoneGainArray = this.state.overtoneGainArray;
     newOvertoneGainArray[overtoneIndex] = gain;
     this.setState({overtoneGainArray: newOvertoneGainArray});
@@ -39,7 +37,7 @@ export default class OverToneSlidersContainer extends React.Component {
   }
 }
 
-var OverTonesAmountSlider = React.createClass({
+const OverTonesAmountSlider = React.createClass({
   getInitialState: function() {
     return {amountOfOvertones: 10};
   },

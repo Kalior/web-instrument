@@ -37,28 +37,6 @@ class WebInstrument extends React.Component {
       initialFrequencyArray[18] = initialFrequencyArray[20] = initialFrequencyArray[22] =
       initialFrequencyArray[24] = initialFrequencyArray[25] = true
 
-    this.handePianoRollChange = this.handePianoRollChange.bind(this)
-    this.handleAttackChange = this.handleAttackChange.bind(this)
-    this.handleDecayChange = this.handleDecayChange.bind(this)
-    this.handleSustainChange = this.handleSustainChange.bind(this)
-    this.handleReleaseChange = this.handleReleaseChange.bind(this)
-    this.handleOvertoneAmountChange = this.handleOvertoneAmountChange.bind(this)
-    this.handleOvertoneArrayChange = this.handleOvertoneArrayChange.bind(this)
-    this.handleLFMFrequencyChange = this.handleLFMFrequencyChange.bind(this)
-    this.handleLFMAmplitudeChange = this.handleLFMAmplitudeChange.bind(this)
-    this.playSound = this.playSound.bind(this)
-    this.toneLength = this.toneLength.bind(this)
-    this.createSource = this.createSource.bind(this)
-    this.createEnvelope = this.createEnvelope.bind(this)
-    this.createLFM = this.createLFM.bind(this)
-    this.startPlaying = this.startPlaying.bind(this)
-    this.stopPlaying = this.stopPlaying.bind(this)
-    this.readyContext = this.readyContext.bind(this)
-    this.createLimiter = this.createLimiter.bind(this)
-    this.playMelodyBeat = this.playMelodyBeat.bind(this)
-    this.onPlayWorkerMessage = this.onPlayWorkerMessage.bind(this)
-    this.handleFrequencyArrayChange = this.handleFrequencyArrayChange.bind(this)
-
     var initialPlayWorker = new Worker("js/playWorker.js")
     initialPlayWorker.onmessage = this.onPlayWorkerMessage
 
@@ -87,13 +65,13 @@ class WebInstrument extends React.Component {
     $('#play-sound').click(this.startPlaying)
     $('#stop-sound').click(this.stopPlaying)
   }
-  onPlayWorkerMessage (e) {
+  onPlayWorkerMessage = e => {
     var tempo = 120.0
     var secondsPerBeat = 60.0 / tempo
     this.setState({currentBeat: e.data})
     this.playMelodyBeat(secondsPerBeat, this.state.limiter)
   }
-  startPlaying () {
+  startPlaying = () => {
     var tempo = 120.0
     var secondsPerBeat = 60.0 / tempo
     if (!this.state.playing) {
@@ -105,13 +83,13 @@ class WebInstrument extends React.Component {
       this.state.playWorker.postMessage([true, secondsPerBeat, this.state.numberOfBeats])
     }
   }
-  stopPlaying () {
+  stopPlaying = () => {
     if (this.state.playing) {
       this.state.playWorker.postMessage([false])
       this.setState({playing: false})
     }
   }
-  readyContext () {
+  readyContext = () => {
     try {
       window.AudioContext = window.AudioContext
       this.setState({context: new AudioContext()})
@@ -120,34 +98,34 @@ class WebInstrument extends React.Component {
       alert(e)
     }
   }
-  handleAttackChange (newAttack) {
+  handleAttackChange = (newAttack) => {
     this.setState({attack: newAttack})
   }
-  handleDecayChange (newDecay) {
+  handleDecayChange = (newDecay) => {
     this.setState({decay: newDecay})
   }
-  handleSustainChange (newSustain) {
+  handleSustainChange = (newSustain) => {
     this.setState({sustain: newSustain})
   }
-  handleReleaseChange (newRelease) {
+  handleReleaseChange = (newRelease) => {
     this.setState({release: newRelease})
   }
-  handePianoRollChange (newNotesGrid) {
+  handePianoRollChange = (newNotesGrid) => {
     this.setState({notesGrid: newNotesGrid})
   }
-  handleOvertoneAmountChange (newOvertonesAmount) {
+  handleOvertoneAmountChange = (newOvertonesAmount) => {
     this.setState({overtonesAmount: newOvertonesAmount})
   }
-  handleOvertoneArrayChange (newOvertonesArray) {
+  handleOvertoneArrayChange = (newOvertonesArray) => {
     this.setState({overtonesArray: newOvertonesArray})
   }
-  handleLFMFrequencyChange (newFrequency) {
+  handleLFMFrequencyChange = (newFrequency) => {
     this.setState({lfmFrequency: newFrequency})
   }
-  handleLFMAmplitudeChange (newAmplitude) {
+  handleLFMAmplitudeChange = (newAmplitude) => {
     this.setState({lfmAmplitude: newAmplitude})
   }
-  handleFrequencyArrayChange (newFrequencyArray) {
+  handleFrequencyArrayChange = (newFrequencyArray) => {
     this.setState({frequencyArray: newFrequencyArray})
   }
 
@@ -192,7 +170,7 @@ class WebInstrument extends React.Component {
       }
     }
   }
-  playSound (freq, startTime, length, limiter) {
+  playSound = (freq, startTime, length, limiter) => {
     var gainSum = 0
     for (let i = 0; i <= this.state.overtonesAmount; i++) {
       gainSum += this.state.overtonesArray[i] / 100
@@ -208,7 +186,7 @@ class WebInstrument extends React.Component {
       envelope.connect(limiter)
     }
   }
-  toneLength (note, beat) {
+  toneLength = (note, beat) => {
     let length = 0
     let currentBeat = beat
     let playing = true
@@ -222,7 +200,7 @@ class WebInstrument extends React.Component {
     }
     return length
   }
-  createSource (gain, freq, startTime, length) {
+  createSource = (gain, freq, startTime, length) => {
     var oscillator = this.state.context.createOscillator()
     var gainNode = this.state.context.createGain()
 
@@ -239,7 +217,7 @@ class WebInstrument extends React.Component {
       gain: gainNode
     })
   }
-  createEnvelope (gain, startTime, length) {
+  createEnvelope = (gain, startTime, length) => {
     var attack = this.state.attack / 100
     var decay = this.state.decay / 100
     var release = this.state.release / 100
@@ -271,7 +249,7 @@ class WebInstrument extends React.Component {
     return gainNode
   }
   // A modulator have a oscillator and a gain
-  createLFM () {
+  createLFM = () => {
     var detuneOscillator = this.state.context.createOscillator()
     var detuneGain = this.state.context.createGain()
     detuneOscillator.frequency.value = this.state.lfmFrequency
@@ -280,7 +258,7 @@ class WebInstrument extends React.Component {
     detuneOscillator.start(0)
     return detuneGain
   }
-  createLimiter () {
+  createLimiter = () => {
     var limiter = this.state.context.createDynamicsCompressor()
 
     limiter.threshold.value = 0.0 // this is the pitfall, leave some headroom

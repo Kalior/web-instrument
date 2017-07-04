@@ -55,27 +55,23 @@ export default class EnvelopeContainer extends React.Component {
   constructor (props) {
     super(props)
     this.state = {attack: 10, decay: 20, sustain: 50, release: 30}
-    this.handleAttackChange = this.handleAttackChange.bind(this)
-    this.handleDecayChange = this.handleDecayChange.bind(this)
-    this.handleSustainChange = this.handleSustainChange.bind(this)
-    this.handleReleaseChange = this.handleReleaseChange.bind(this)
   }
-  handleAttackChange (newAttack) {
+  handleAttackChange = (newAttack) => {
     this.setState({attack: newAttack})
     drawEnvelope(this.state.attack, this.state.decay, this.state.release, this.state.sustain)
     this.props.onAttackChange(newAttack)
   }
-  handleDecayChange (newDecay) {
+  handleDecayChange = (newDecay) => {
     this.setState({decay: newDecay})
     drawEnvelope(this.state.attack, this.state.decay, this.state.release, this.state.sustain)
     this.props.onDecayChange(newDecay)
   }
-  handleSustainChange (newSustain) {
+  handleSustainChange = (newSustain) => {
     this.setState({sustain: newSustain})
     drawEnvelope(this.state.attack, this.state.decay, this.state.release, this.state.sustain)
     this.props.onSustainChange(newSustain)
   }
-  handleReleaseChange (newRelease) {
+  handleReleaseChange = (newRelease) => {
     this.setState({release: newRelease})
     drawEnvelope(this.state.attack, this.state.decay, this.state.release, this.state.sustain)
     this.props.onReleaseChange(newRelease)
