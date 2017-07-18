@@ -1,11 +1,11 @@
 html {
-    max-width: 100%;
+    max-width:  100%;
     overflow-x: hidden;
 }
 
 .container {
-  background-color: #fff;
-  padding:          10px;
+  width:   45%;
+  padding: 10px;
 }
 
 #envelope-graph {
@@ -56,6 +56,10 @@ html {
   justify-content: center;
 }
 
+.inline {
+  display: inline;
+}
+
 .larger {
   display: inline;
   font-size: 20px;
@@ -68,4 +72,46 @@ html {
 
 .overtone-slider {
   margin-bottom: 30px;
+}
+
+.web-instrument {
+  display:         flex;
+  flex-flow:       row wrap;
+  justify-content: space-between;
+}
+
+.instrument-container {
+  max-width: 840px;
+}
+
+.instrument-picker {
+  display: flex;
+  flex-flow: row;
+  align-items: center;
+  justify-content: space-around;
+  width: 100%;
+}
+
+.top-instrument {
+  flex: 1;
+  cursor: pointer;
+}
+
+.new-instrument {
+  cursor: pointer;
+  transition: all 300ms;
+  &:hover {
+    color: green;
+  }
+}
+
+.active-instrument {
+  color: green;
+}
+
+.name-container {
+  display: flex;
+  .fa {
+    cursor: pointer;
+  }
 }
