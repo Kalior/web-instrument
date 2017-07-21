@@ -1,6 +1,7 @@
 import React from "react";
 import { render } from "react-dom";
 import WebInstrument from "./WebInstrument.jsx";
+import Visualiser from "./Visualiser.jsx"
 
 const NUMBER_OF_BEATS = 16;
 const toneFrequencies = [
@@ -48,11 +49,11 @@ export default class MainView extends React.Component {
       selectedInstrumentIndex: 0,
       playing: false,
       numberOfBeats: 16,
-      instruments : [this.createInstrument("Instrument")]
+      instruments : [this.createInstrument("Instrument", null)]
     };
   }
 
-  createInstrument = (name) => {
+  createInstrument = (name, context) => {
     const numerOfNotes = 26
     const initialOvertoneGainArray = [];
     for (let i = 0; i <= 25; i++) {
@@ -73,6 +74,11 @@ export default class MainView extends React.Component {
       initialFrequencyArray[i] = false;
     }
 
+    let visualiser = null;
+    if (context !== null) {
+      visualiser = context.createAnalyser();
+    }
+
     // Standard C scale
     initialFrequencyArray[13] = initialFrequencyArray[15] = initialFrequencyArray[17] = initialFrequencyArray[18] = initialFrequencyArray[20] = initialFrequencyArray[22] = initialFrequencyArray[24] = initialFrequencyArray[25] = true;
     let initialInstrument = {
@@ -87,7 +93,8 @@ export default class MainView extends React.Component {
       lfmFrequency: 5,
       lfmAmplitude: 2,
       frequencyArray: initialFrequencyArray,
-      name: name
+      name: name,
+      visualiser: visualiser
     };
     return initialInstrument;
   }
@@ -107,12 +114,14 @@ export default class MainView extends React.Component {
           currentBeat={currentBeat}
         />
         <div className="instrument-picker">
-          {instruments.map((instrument, index) => this.createTopInstrument(instrument, index))}
           <div
             className="new-instrument"
             onClick={this.addInstrument}
           >
-            <i className="fa fa-plus-square fa-3x" aria-hidden="true" />
+            Add new instrument
+          </div>
+          <div className="visualiser-container">
+            {instruments.map((instrument, index) => this.createTopInstrument(instrument, index))}
           </div>
         </div>
       </div>
@@ -129,13 +138,16 @@ export default class MainView extends React.Component {
     const {selectedInstrumentIndex} = this.state;
     return (
       <div
-        className={index === this.state.selectedInstrumentIndex ?
-                                "top-instrument active-instrument" :
-                                "top-instrument"}
+        className={"top-instrument-container"}
         onClick={this.changeActiveInstrument.bind(this, index)}
         key={index}
       >
-        {instrument.name}
+        <Visualiser
+          visualiser={instrument.visualiser}
+          index={index}
+          isTop={index === selectedInstrumentIndex}
+          playing={this.state.playing}
+        />
       </div>
     );
   }
@@ -149,7 +161,15 @@ export default class MainView extends React.Component {
       window.AudioContext = window.AudioContext;
       const context = new AudioContext();
       const limiter = this.createLimiter(context);
-      this.setState({ limiter: limiter, context: context });
+      const instruments = this.state.instruments;
+      for (let i = 0; i < instruments.length; i++) {
+        instruments[i].visualiser = context.createAnalyser();
+      }
+      this.setState({
+        limiter: limiter,
+        context: context,
+        instruments: instruments
+      });
     } catch (e) {
       alert(e);
     }
@@ -207,6 +227,7 @@ export default class MainView extends React.Component {
             context.currentTime,
             0.25 * secondsPerBeat * this.toneLength(i, currentBeat, instrument.notesGrid),
             limiter,
+            instrument.visualiser,
             context,
             instrument
           );
@@ -220,13 +241,14 @@ export default class MainView extends React.Component {
           context.currentTime,
           0.25 * secondsPerBeat * this.toneLength(i, currentBeat, instrument.notesGrid),
           limiter,
+          instrument.visualiser,
           context,
           instrument
         );
       }
     }
   }
-  playSound = (freq, startTime, length, limiter, context, instrument) => {
+  playSound = (freq, startTime, length, limiter, visualiser, context, instrument) => {
     var gainSum = 0;
     for (let i = 0; i <= instrument.overtonesAmount; i++) {
       gainSum += instrument.overtonesArray[i] / 100;
@@ -248,7 +270,8 @@ export default class MainView extends React.Component {
       );
       lfm.connect(source.oscillator.frequency);
       source.gain.connect(envelope);
-      envelope.connect(limiter);
+      envelope.connect(visualiser);
+      visualiser.connect(limiter);
     }
   };
   toneLength = (note, beat, notesGrid) => {
@@ -266,8 +289,8 @@ export default class MainView extends React.Component {
     return length;
   };
   createSource = (gain, freq, startTime, length, context) => {
-    var oscillator = context.createOscillator();
-    var gainNode = context.createGain();
+    let oscillator = context.createOscillator();
+    let gainNode = context.createGain();
 
     gainNode.gain.value = gain;
 
@@ -275,7 +298,8 @@ export default class MainView extends React.Component {
 
     oscillator.start(startTime);
     oscillator.stop(startTime + length + 0.1);
-    oscillator.connect(gainNode);
+
+    oscillator.connect(gainNode)
 
     return {
       oscillator: oscillator,
@@ -283,13 +307,13 @@ export default class MainView extends React.Component {
     };
   };
   createEnvelope = (gain, startTime, length, attack, decay, release, sustain, context) => {
-    var attack = attack / 100;
-    var decay = decay / 100;
-    var release = release / 100;
-    var sustainTime = length - attack - decay - release;
-    var sustainGain = sustain / 100;
+    attack = attack / 100;
+    decay = decay / 100;
+    release = release / 100;
+    let sustainTime = length - attack - decay - release;
+    let sustainGain = sustain / 100;
     // Setting the Envelope
-    var gainNode = context.createGain();
+    let gainNode = context.createGain();
     gainNode.gain.setValueAtTime(0.0, startTime);
 
     if (length > attack) {
@@ -302,7 +326,7 @@ export default class MainView extends React.Component {
         decay * 0.2
       );
       // Release
-      var timeBeforeRelease =
+      let timeBeforeRelease =
         startTime + attack + decay + Math.max(0, sustainTime);
 
       gainNode.gain.setTargetAtTime(0.0, timeBeforeRelease, release * 0.2);
@@ -323,8 +347,8 @@ export default class MainView extends React.Component {
   };
   // A modulator have a oscillator and a gain
   createLFM = (lfmFrequency, lfmAmplitude, context) => {
-    var detuneOscillator = context.createOscillator();
-    var detuneGain = context.createGain();
+    let detuneOscillator = context.createOscillator();
+    let detuneGain = context.createGain();
     detuneOscillator.frequency.value = lfmFrequency;
     detuneGain.gain.value = lfmAmplitude;
     detuneOscillator.connect(detuneGain);
@@ -332,7 +356,7 @@ export default class MainView extends React.Component {
     return detuneGain;
   };
   createLimiter = context => {
-    var limiter = context.createDynamicsCompressor();
+    let limiter = context.createDynamicsCompressor();
 
     limiter.threshold.value = 0.0; // this is the pitfall, leave some headroom
     limiter.knee.value = 0.0; // brute force

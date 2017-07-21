@@ -1,19 +1,6 @@
 html {
-    max-width:  100%;
-    overflow-x: hidden;
-}
-
-.container {
-  width:   45%;
-  padding: 10px;
-}
-
-#envelope-graph {
-  border-radius:    3px;
-  border-color:     #cdc;
-  border-width:     1px;
-  border-style:     solid;
-  width:            100%;
+  max-width:  100%;
+  overflow-x: hidden;
 }
 
 .button-container {
@@ -25,7 +12,7 @@ html {
 }
 
 .play-control-button {
-  flex-grow: 1;
+  flex: 1;
 }
 
 #footer {
@@ -56,6 +43,12 @@ html {
   justify-content: center;
 }
 
+#content {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-around;
+}
+
 .inline {
   display: inline;
 }
@@ -65,53 +58,84 @@ html {
   font-size: 20px;
 }
 
-.rc-slider {
-  margin: 15px;
-  width: 95%;
-}
-
-.overtone-slider {
-  margin-bottom: 30px;
-}
-
-.web-instrument {
-  display:         flex;
-  flex-flow:       row wrap;
-  justify-content: space-between;
-}
-
 .instrument-container {
-  max-width: 840px;
-}
-
-.instrument-picker {
-  display: flex;
-  flex-flow: row;
-  align-items: center;
-  justify-content: space-around;
-  width: 100%;
-}
-
-.top-instrument {
+  max-width: 900px;
   flex: 1;
-  cursor: pointer;
-}
 
-.new-instrument {
-  cursor: pointer;
-  transition: all 300ms;
-  &:hover {
-    color: green;
+  .rc-slider {
+    margin: 15px;
+    width: 95%;
+  }
+
+  .overtone-slider {
+    margin-bottom: 30px;
+  }
+  .name-container {
+    display: flex;
+    .fa {
+      cursor: pointer;
+    }
+  }
+  .web-instrument {
+    display:         flex;
+    flex-flow:       row wrap;
+    justify-content: space-between;
+  }
+  .container {
+    width:   45%;
+    padding: 10px;
+  }
+  #envelope-graph {
+    border-radius:    3px;
+    border-color:     #cdc;
+    border-width:     1px;
+    border-style:     solid;
+    width:            100%;
   }
 }
 
-.active-instrument {
-  color: green;
-}
 
-.name-container {
+.instrument-picker {
   display: flex;
-  .fa {
+  flex-flow: column;
+  align-items: center;
+  justify-content: flex-start;
+  margin-top: 1em;
+  flex: 1;
+
+  .new-instrument {
     cursor: pointer;
+    transition: all 300ms;
+    &:hover {
+      color: green;
+    }
+  }
+
+  .visualiser-container {
+    display: flex;
+    flex-flow: column wrap;
+    align-items: center;
+    justify-content: space-around;
+
+    &:last-child {
+      margin-right: 0px;
+    }
+
+    .top-instrument-container {
+      flex: 1;
+      cursor: pointer;
+      margin-right: 5px;
+
+      .instrument-visualiser {
+        transition: all 300ms;
+      }
+
+      .instrument-visualiser:hover {
+        box-shadow: 0px 0px 2px 3px rgba(0, 0, 0, 0.2);
+      }
+      .active-instrument {
+        box-shadow: 0px 0px 2px 3px rgba(120, 0, 0, 0.2);
+      }
+    }
   }
 }
