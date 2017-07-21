@@ -97,7 +97,7 @@ export default class WebInstrument extends React.Component {
     } = this.state.instrument;
     const { currentBeat } = this.props;
     return (
-      <div>
+      <div className="instrument-container">
         <NameContainer
           name={name}
           onNameChange={this.handleNameChange}
@@ -108,6 +108,7 @@ export default class WebInstrument extends React.Component {
             onOvertoneArrayChange={this.handleOvertoneArrayChange}
             overtonesAmount={overtonesAmount}
             overtoneGainArray={overtonesArray}
+            name={name}
           />
           <PianoRollContainer
             onPianoRollChange={this.handePianoRollChange}
@@ -115,6 +116,7 @@ export default class WebInstrument extends React.Component {
             currentBeat={currentBeat}
             frequencyArray={frequencyArray}
             onFrequencyArrayChange={this.handleFrequencyArrayChange}
+            name={name}
           />
           <EnvelopeContainer
             attack={attack}
@@ -125,12 +127,14 @@ export default class WebInstrument extends React.Component {
             onDecayChange={this.handleDecayChange}
             onReleaseChange={this.handleReleaseChange}
             onSustainChange={this.handleSustainChange}
+            name={name}
           />
           <LowFrequencyModulationContainer
             lfmFrequency={lfmFrequency}
             lfmAmplitude={lfmAmplitude}
             onFrequencyChange={this.handleLFMFrequencyChange}
             onAmplitudeChange={this.handleLFMAmplitudeChange}
+            name={name}
           />
         </div>
       </div>

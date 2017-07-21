@@ -6,14 +6,19 @@ export default class LowFrequencyModulationContainer extends React.Component {
     super(props);
     this.state = {
       newFrequency: this.props.lfmFrequency,
-      newAmplitude: this.props.lfmAmplitude
+      newAmplitude: this.props.lfmAmplitude,
+      name: this.props.name
     }
   }
   componentWillReceiveProps(nextProps) {
-    this.setState({
-      newFrequency: nextProps.lfmFrequency,
-      newAmplitude: nextProps.lfmAmplitude
-    });
+    const { nane } = this.state;
+    if (name !== nextProps.name) {
+      this.setState({
+        newFrequency: nextProps.lfmFrequency,
+        newAmplitude: nextProps.lfmAmplitude,
+        name: nextProps.name
+      });
+    }
   }
   onFrequencyChange = value => {
     this.props.onFrequencyChange(value);

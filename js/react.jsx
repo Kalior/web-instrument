@@ -101,6 +101,11 @@ export default class MainView extends React.Component {
     const selectedInstrument = instruments[selectedInstrumentIndex];
     return (
       <div id="content">
+        <WebInstrument
+          onInstrumentChange={this.handleInstrumentChange.bind(this, selectedInstrumentIndex)}
+          instrument={selectedInstrument}
+          currentBeat={currentBeat}
+        />
         <div className="instrument-picker">
           {instruments.map((instrument, index) => this.createTopInstrument(instrument, index))}
           <div
@@ -110,24 +115,18 @@ export default class MainView extends React.Component {
             <i className="fa fa-plus-square fa-3x" aria-hidden="true" />
           </div>
         </div>
-        <div className="instrument-container">
-          <WebInstrument
-            onInstrumentChange={this.handleInstrumentChange.bind(this, selectedInstrumentIndex)}
-            instrument={selectedInstrument}
-            currentBeat={currentBeat}
-          />
-        </div>
       </div>
     );
   }
   addInstrument = () => {
-    let newInstruments = this.state.instruments;
-    const name = "Instrument " + newInstruments.length
-    const newInstrument = this.createInstrument(name);
-    newInstruments.push(newInstrument);
-    this.setState({instruments: newInstruments})
+    let { instruments, context } = this.state;
+    const name = "Instrument " + instruments.length
+    const newInstrument = this.createInstrument(name, context);
+    instruments.push(newInstrument);
+    this.setState({instruments: instruments})
   }
   createTopInstrument = (instrument, index) => {
+    const {selectedInstrumentIndex} = this.state;
     return (
       <div
         className={index === this.state.selectedInstrumentIndex ?

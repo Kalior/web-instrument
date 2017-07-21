@@ -58,17 +58,21 @@ export default class EnvelopeContainer extends React.Component {
       newAttack: props.attack,
       newDecay: props.decay,
       newRelease: props.release,
-      newSustain: props.sustain
+      newSustain: props.sustain,
+      name: props.name
     };
   }
   componentWillReceiveProps(nextProps) {
-    this.setState({
-      newAttack: nextProps.attack,
-      newDecay: nextProps.decay,
-      newRelease: nextProps.release,
-      newSustain: nextProps.sustain
-    });
-    drawEnvelope(nextProps.attack, nextProps.decay, nextProps.release, nextProps.sustain)
+    if (this.state.name !== nextProps.name) {
+      this.setState({
+        newAttack: nextProps.attack,
+        newDecay: nextProps.decay,
+        newRelease: nextProps.release,
+        newSustain: nextProps.sustain,
+        name: nextProps.name
+      });
+      drawEnvelope(nextProps.attack, nextProps.decay, nextProps.release, nextProps.sustain)
+    }
   }
   handleAttackChange = (newAttack) => {
     this.props.onAttackChange(newAttack);

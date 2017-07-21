@@ -5,8 +5,17 @@ export default class OverToneSlidersContainer extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      newOvertoneGainArray: props.overtoneGainArray
+      newOvertoneGainArray: props.overtoneGainArray,
+      name: props.name
     };
+  }
+  componentWillReceiveProps(nextProps) {
+    if (this.state.name !== nextProps.name) {
+      this.setState({
+        newOvertoneGainArray: nextProps.overtoneGainArray,
+        name: nextProps.name
+      })
+    }
   }
   onOvertoneAmountChange = value => {
     this.setState({ amountOfOvertones: value });
@@ -44,6 +53,7 @@ export default class OverToneSlidersContainer extends React.Component {
         <OverTonesAmountSlider
           overtonesAmount={this.props.overtonesAmount}
           onOvertoneChange={this.onOvertoneAmountChange}
+          name={this.props.name}
         />
         <b>Controls</b>
         {overtoneSliders}
@@ -56,7 +66,16 @@ class OverTonesAmountSlider extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      newOvertonesAmount: props.overtonesAmount
+      newOvertonesAmount: props.overtonesAmount,
+      name: props.name
+    }
+  }
+  componentWillReceiveProps(nextProps) {
+    if (this.state.name !== nextProps.name) {
+      this.setState({
+        newOvertonesAmount: nextProps.overtonesAmount,
+        name: nextProps.name
+      })
     }
   }
   onAmountChange = value => {
