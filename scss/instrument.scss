@@ -15,6 +15,10 @@ html {
   flex: 1;
 }
 
+#react-web-instrument {
+  flex: 1;
+}
+
 #footer {
   clear:            both;
   background-color: #333;
@@ -41,12 +45,27 @@ html {
   margin-bottom: 60px;
   display: flex;
   justify-content: center;
+
+  @media screen and (max-width: 640px) {
+    flex-flow: column;
+  }
+
+  @media screen and (min-width: 640px) {
+    flex-flow: row;
+  }
 }
 
 #content {
   display: flex;
-  flex-flow: row nowrap;
-  justify-content: space-around;
+  justify-content: space-between;
+
+  @media screen and (max-width: 640px) {
+    flex-flow: column;
+  }
+
+  @media screen and (min-width: 640px) {
+    flex-flow: row nowrap;
+  }
 }
 
 .inline {
@@ -59,8 +78,20 @@ html {
 }
 
 .instrument-container {
-  max-width: 900px;
+  display: flex;
   flex: 1;
+
+  @media screen and (max-width: 640px) {
+    justify-content: flex-start;
+  }
+
+  @media screen and (min-width: 640px) {
+    justify-content: center;
+  }
+
+  .instrument-inner-container {
+    max-width: 900px;
+  }
 
   .rc-slider {
     margin: 15px;
@@ -78,8 +109,15 @@ html {
   }
   .web-instrument {
     display:         flex;
-    flex-flow:       row wrap;
     justify-content: space-between;
+
+    @media screen and (max-width: 640px) {
+      flex-flow: column;
+    }
+
+    @media screen and (min-width: 640px) {
+      flex-flow: row wrap;
+    }
   }
   .container {
     width:   45%;
@@ -101,11 +139,11 @@ html {
   align-items: center;
   justify-content: flex-start;
   margin-top: 1em;
-  flex: 1;
 
   .new-instrument {
     cursor: pointer;
     transition: all 300ms;
+    margin-bottom: 1em;
     &:hover {
       color: green;
     }
@@ -113,7 +151,7 @@ html {
 
   .visualiser-container {
     display: flex;
-    flex-flow: column wrap;
+    flex-flow: column nowrap;
     align-items: center;
     justify-content: space-around;
 

@@ -97,7 +97,7 @@ export default class WebInstrument extends React.Component {
     } = this.state.instrument;
     const { currentBeat } = this.props;
     return (
-      <div className="instrument-container">
+      <div className="instrument-inner-container">
         <NameContainer
           name={name}
           onNameChange={this.handleNameChange}

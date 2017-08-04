@@ -108,11 +108,13 @@ export default class MainView extends React.Component {
     const selectedInstrument = instruments[selectedInstrumentIndex];
     return (
       <div id="content">
-        <WebInstrument
-          onInstrumentChange={this.handleInstrumentChange.bind(this, selectedInstrumentIndex)}
-          instrument={selectedInstrument}
-          currentBeat={currentBeat}
-        />
+        <div className="instrument-container">
+          <WebInstrument
+            onInstrumentChange={this.handleInstrumentChange.bind(this, selectedInstrumentIndex)}
+            instrument={selectedInstrument}
+            currentBeat={currentBeat}
+          />
+        </div>
         <div className="instrument-picker">
           <div
             className="new-instrument"
