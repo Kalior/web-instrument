@@ -5,13 +5,13 @@ export default class LowFrequencyModulationContainer extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      newFrequency: this.props.lfmFrequency,
-      newAmplitude: this.props.lfmAmplitude,
-      name: this.props.name
+      newFrequency: props.lfmFrequency,
+      newAmplitude: props.lfmAmplitude,
+      name: props.name
     }
   }
   componentWillReceiveProps(nextProps) {
-    const { nane } = this.state;
+    const { name } = this.state;
     if (name !== nextProps.name) {
       this.setState({
         newFrequency: nextProps.lfmFrequency,
@@ -53,7 +53,7 @@ export default class LowFrequencyModulationContainer extends React.Component {
           value={this.state.newAmplitude}
           step={0.1}
           marks={{ 0: "0", 40: "40" }}
-          onChange={this.onAmplitudeChange}
+          onChange={this.onAmplitudeUpdate}
           onAfterChange={this.onAmplitudeChange}
         />
       </div>
