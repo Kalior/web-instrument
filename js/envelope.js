@@ -2,16 +2,16 @@ import React from 'react'
 import Rcslider from 'rc-slider-colored'
 
 function drawEnvelope (attack, decay, release, sustainGain) {
-  var canvas = document.getElementById('envelope-graph')
-  var context = canvas.getContext('2d')
+  const canvas = document.getElementById('envelope-graph')
+  const context = canvas.getContext('2d')
   context.clearRect(0, 0, canvas.width, canvas.height)
   context.lineWidth = '2'
 
-  var envelopeAttack = canvas.width * attack / 100
-  var envelopeDecay = canvas.width * decay / 100
-  var envelopeRelease = canvas.width * release / 100
-  var envelopeSustainGain = canvas.height * (1 - sustainGain / 100)
-  var envelopeSustainTime = canvas.width - envelopeAttack - envelopeDecay - envelopeRelease
+  const envelopeAttack = canvas.width * attack / 100
+  const envelopeDecay = canvas.width * decay / 100
+  const envelopeRelease = canvas.width * release / 100
+  const envelopeSustainGain = canvas.height * (1 - sustainGain / 100)
+  const envelopeSustainTime = canvas.width - envelopeAttack - envelopeDecay - envelopeRelease
 
   context.beginPath()
   context.moveTo(0, canvas.height)
@@ -23,7 +23,7 @@ function drawEnvelope (attack, decay, release, sustainGain) {
   context.moveTo(envelopeAttack, 0)
   drawSetTargetAtTime(context, envelopeAttack, envelopeDecay, 0, envelopeSustainGain, envelopeDecay * 0.2, '#3adb76')
 
-  var timeBeforeRelease = envelopeAttack + envelopeDecay
+  let timeBeforeRelease = envelopeAttack + envelopeDecay
   if (envelopeSustainTime >= 0) {
     context.lineTo(envelopeAttack + envelopeDecay + envelopeSustainTime, envelopeSustainGain)
     context.strokeStyle = '#777777'
@@ -118,10 +118,11 @@ export default class EnvelopeContainer extends React.Component {
             id={'attack-envelope-input'}
             value={this.state.newAttack}
             min={0}
-            max={100}
+            max={20}
+            step={0.1}
             onAfterChange={this.handleAttackChange}
             onChange={this.handleAttackUpdate}
-            marks={{0: {color: '#2199e8', label: '0 ms'}, 100: {label: '100 ms'}}}
+            marks={{0: {color: '#2199e8', label: '0 ms'}, 20: {label: '20 ms'}}}
           />
           <b>Decay</b>
           <Rcslider

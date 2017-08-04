@@ -85,7 +85,7 @@ export default class MainView extends React.Component {
       notesGrid: initialNotesGrid,
       overtonesAmount: 10,
       overtonesArray: initialOvertoneGainArray,
-      attack: 10,
+      attack: 5,
       decay: 20,
       sustain: 50,
       release: 30,
