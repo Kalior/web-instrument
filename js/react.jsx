@@ -183,8 +183,8 @@ export default class MainView extends React.Component {
     $("#stop-sound").click(this.stopPlaying);
   }
   startPlaying = () => {
-    var tempo = 120.0;
-    var secondsPerBeat = 60.0 / tempo;
+    const tempo = 120.0;
+    const secondsPerBeat = 60.0 / tempo;
     if (!this.state.playing) {
       this.setState({
         playing: true,
