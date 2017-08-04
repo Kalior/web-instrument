@@ -132,7 +132,10 @@ export default class MainView extends React.Component {
     const name = "Instrument " + instruments.length
     const newInstrument = this.createInstrument(name, context);
     instruments.push(newInstrument);
-    this.setState({instruments: instruments})
+    this.setState({
+      instruments: instruments,
+      selectedInstrumentIndex: instruments.length - 1
+    });
   }
   createTopInstrument = (instrument, index) => {
     const {selectedInstrumentIndex} = this.state;
