@@ -265,7 +265,7 @@ export default class MainView extends React.Component {
 
     for (let i = 0; i < instrument.overtonesAmount; i++) {
       const source = this.createSource(
-        instrument.overtonesArray[i] / (100 * gainSum * 2),
+        (instrument.overtonesArray[i] / 200) * Math.exp(-i * 0.25),
         freq * (i + 1),
         startTime,
         length,
