@@ -139,14 +139,12 @@ html {
   align-items: center;
   justify-content: flex-start;
   margin-top: 1em;
+  margin-right: 1em;
 
   .new-instrument {
     cursor: pointer;
     transition: all 300ms;
     margin-bottom: 1em;
-    &:hover {
-      color: green;
-    }
   }
 
   .visualiser-container {

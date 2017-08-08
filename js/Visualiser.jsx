@@ -1,5 +1,4 @@
 import React from 'react'
-import Rcslider from 'rc-slider-colored'
 
 export default class Visualiser extends React.Component {
   constructor(props) {

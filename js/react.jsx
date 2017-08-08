@@ -119,13 +119,13 @@ export default class MainView extends React.Component {
         </div>
         <div className="instrument-picker">
           <div
-            className="new-instrument"
+            className="new-instrument button expanded"
             onClick={this.addInstrument}
           >
             Add new instrument
           </div>
           <div className="visualiser-container">
-            {instruments.map((instrument, index) => this.createTopInstrument(instrument, index))}
+            {instruments.map((instrument, index) => this.createVisualiser(instrument, index))}
           </div>
         </div>
       </div>
@@ -141,7 +141,7 @@ export default class MainView extends React.Component {
       selectedInstrumentIndex: instruments.length - 1
     });
   }
-  createTopInstrument = (instrument, index) => {
+  createVisualiser = (instrument, index) => {
     const {selectedInstrumentIndex} = this.state;
     return (
       <div
