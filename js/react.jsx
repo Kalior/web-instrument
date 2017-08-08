@@ -2,6 +2,7 @@ import React from "react";
 import { render } from "react-dom";
 import WebInstrument from "./WebInstrument.jsx";
 import Visualiser from "./Visualiser.jsx"
+import MuteButton from "./MuteButton.jsx"
 
 const NUMBER_OF_BEATS = 16;
 const toneFrequencies = [
@@ -94,7 +95,8 @@ export default class MainView extends React.Component {
       lfmAmplitude: 2,
       frequencyArray: initialFrequencyArray,
       name: name,
-      visualiser: visualiser
+      visualiser: visualiser,
+      muted: false
     };
     return initialInstrument;
   }
@@ -147,8 +149,13 @@ export default class MainView extends React.Component {
         onClick={this.changeActiveInstrument.bind(this, index)}
         key={index}
       >
+        <MuteButton
+          handleToggleMuted={this.toggleMutedInstrument.bind(this, index)}
+          muted={instrument.muted}
+        />
         <Visualiser
           visualiser={instrument.visualiser}
+          muted={instrument.muted}
           index={index}
           isTop={index === selectedInstrumentIndex}
           playing={this.state.playing}
@@ -156,6 +163,12 @@ export default class MainView extends React.Component {
       </div>
     );
   }
+  toggleMutedInstrument = (instrumentIndex) => {
+    let newInstruments = this.state.instruments;
+    newInstruments[instrumentIndex].muted = !newInstruments[instrumentIndex].muted;
+    this.setState({instruments: newInstruments});
+  };
+
   handleInstrumentChange = (instrumentIndex, newInstrument) => {
     let newInstruments = this.state.instruments;
     newInstruments[instrumentIndex] = newInstrument;
@@ -213,7 +226,9 @@ export default class MainView extends React.Component {
     const { limiter, context, instruments } = this.state;
     // Play the current beat for all instruments.
     for (let i = 0; i < instruments.length; i++) {
-      this.playMelodyBeat(secondsPerBeat, currentBeat, limiter, context, instruments[i]);
+      if (!instruments[i].muted) {
+        this.playMelodyBeat(secondsPerBeat, currentBeat, limiter, context, instruments[i]);
+      }
     }
   };
   componentWillUnmount() {

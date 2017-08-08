@@ -22,28 +22,29 @@ export default class Visualiser extends React.Component {
       return;
     }
 
+    const { index } = this.props;
+
     visualiser.fftSize = 2048;
     var bufferLength = visualiser.frequencyBinCount;
     var dataArray = new Uint8Array(bufferLength);
     visualiser.getByteTimeDomainData(dataArray);
 
     // Get a canvas defined with ID "oscilloscope"
-    var canvas = document.getElementById("oscilloscope-" + this.props.index);
+    var canvas = document.getElementById("oscilloscope-" + index);
     var canvasCtx = canvas.getContext("2d");
 
     // draw an oscilloscope of the current audio source
     const draw = () => {
+      const { muted } = this.props;
+
       requestAnimationFrame(draw);
       visualiser.getByteTimeDomainData(dataArray);
 
-      // const rect = canvas.parentNode.getBoundingClientRect();
-      // canvas.width = rect.width;
-
-      canvasCtx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+      canvasCtx.fillStyle = muted ? 'rgb(255, 255, 255)' : 'rgba(255, 255, 255, 0.8)';
       canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
 
       canvasCtx.lineWidth = 2;
-      canvasCtx.strokeStyle = 'rgba(0, 0, 0, 0.6)';
+      canvasCtx.strokeStyle = muted ? 'rgba(0, 0, 0, 0.1)' : 'rgba(0, 0, 0, 0.6)';
 
       canvasCtx.beginPath();
 
