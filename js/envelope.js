@@ -2,16 +2,16 @@ import React from 'react'
 import Rcslider from 'rc-slider-colored'
 
 function drawEnvelope (attack, decay, release, sustainGain) {
-  var canvas = document.getElementById('envelope-graph')
-  var context = canvas.getContext('2d')
+  const canvas = document.getElementById('envelope-graph')
+  const context = canvas.getContext('2d')
   context.clearRect(0, 0, canvas.width, canvas.height)
   context.lineWidth = '2'
 
-  var envelopeAttack = canvas.width * attack / 100
-  var envelopeDecay = canvas.width * decay / 100
-  var envelopeRelease = canvas.width * release / 100
-  var envelopeSustainGain = canvas.height * (1 - sustainGain / 100)
-  var envelopeSustainTime = canvas.width - envelopeAttack - envelopeDecay - envelopeRelease
+  const envelopeAttack = canvas.width * attack / 100
+  const envelopeDecay = canvas.width * decay / 100
+  const envelopeRelease = canvas.width * release / 100
+  const envelopeSustainGain = canvas.height * (1 - sustainGain / 100)
+  const envelopeSustainTime = canvas.width - envelopeAttack - envelopeDecay - envelopeRelease
 
   context.beginPath()
   context.moveTo(0, canvas.height)
@@ -23,7 +23,7 @@ function drawEnvelope (attack, decay, release, sustainGain) {
   context.moveTo(envelopeAttack, 0)
   drawSetTargetAtTime(context, envelopeAttack, envelopeDecay, 0, envelopeSustainGain, envelopeDecay * 0.2, '#3adb76')
 
-  var timeBeforeRelease = envelopeAttack + envelopeDecay
+  let timeBeforeRelease = envelopeAttack + envelopeDecay
   if (envelopeSustainTime >= 0) {
     context.lineTo(envelopeAttack + envelopeDecay + envelopeSustainTime, envelopeSustainGain)
     context.strokeStyle = '#777777'
@@ -52,53 +52,108 @@ $('.envelope-slider').on('moved.zf.slider', function () {
 })
 
 export default class EnvelopeContainer extends React.Component {
-  constructor (props) {
-    super(props)
-    this.state = {attack: 10, decay: 20, sustain: 50, release: 30}
+  constructor(props) {
+    super(props);
+    this.state = {
+      newAttack: props.attack,
+      newDecay: props.decay,
+      newRelease: props.release,
+      newSustain: props.sustain,
+      name: props.name
+    };
+  }
+  componentWillReceiveProps(nextProps) {
+    if (this.state.name !== nextProps.name) {
+      this.setState({
+        newAttack: nextProps.attack,
+        newDecay: nextProps.decay,
+        newRelease: nextProps.release,
+        newSustain: nextProps.sustain,
+        name: nextProps.name
+      });
+      drawEnvelope(nextProps.attack, nextProps.decay, nextProps.release, nextProps.sustain)
+    }
   }
   handleAttackChange = (newAttack) => {
-    this.setState({attack: newAttack})
-    drawEnvelope(this.state.attack, this.state.decay, this.state.release, this.state.sustain)
-    this.props.onAttackChange(newAttack)
+    this.props.onAttackChange(newAttack);
   }
   handleDecayChange = (newDecay) => {
-    this.setState({decay: newDecay})
-    drawEnvelope(this.state.attack, this.state.decay, this.state.release, this.state.sustain)
-    this.props.onDecayChange(newDecay)
-  }
-  handleSustainChange = (newSustain) => {
-    this.setState({sustain: newSustain})
-    drawEnvelope(this.state.attack, this.state.decay, this.state.release, this.state.sustain)
-    this.props.onSustainChange(newSustain)
+    this.props.onDecayChange(newDecay);
   }
   handleReleaseChange = (newRelease) => {
-    this.setState({release: newRelease})
-    drawEnvelope(this.state.attack, this.state.decay, this.state.release, this.state.sustain)
-    this.props.onReleaseChange(newRelease)
+    this.props.onReleaseChange(newRelease);
+  }
+  handleSustainChange = (newSustain) => {
+    this.props.onSustainChange(newSustain);
+  }
+  handleAttackUpdate = (newAttack) => {
+    drawEnvelope(newAttack, this.props.decay, this.props.release, this.props.sustain);
+    this.setState({ newAttack: newAttack });
+  }
+  handleDecayUpdate = (newDecay) => {
+    drawEnvelope(this.props.attack, newDecay, this.props.release, this.props.sustain)
+    this.setState({ newDecay: newDecay });
+  }
+  handleReleaseUpdate = (newRelease) => {
+    drawEnvelope(this.props.attack, this.props.decay, newRelease, this.props.sustain)
+    this.setState({ newRelease: newRelease });
+  }
+  handleSustainUpdate = (newSustain) => {
+    drawEnvelope(this.props.attack, this.props.decay, this.props.release, newSustain)
+    this.setState({ newSustain: newSustain });
   }
   componentDidMount () {
-    drawEnvelope(this.state.attack, this.state.decay, this.state.release, this.state.sustain)
+    drawEnvelope(this.props.attack, this.props.decay, this.props.release, this.props.sustain)
   }
   render () {
     return (
-      <div className='container column small-12 medium-6'>
+      <div className='container'>
         <h4>Envelope</h4>
         <div id='envelope-container'>
           <b>Visualization</b>
           <canvas id='envelope-graph' height={200} width={800} />
           <br />
           <b>Attack</b>
-          <Rcslider id={'attack-envelope-input'} defaultValue={this.state.attack}
-            min={0} max={100} onChange={this.handleAttackChange} marks={{0: {color: '#2199e8', label: '0 ms'}, 100: {label: '100 ms'}}} />
+          <Rcslider
+            id={'attack-envelope-input'}
+            value={this.state.newAttack}
+            min={0}
+            max={20}
+            step={0.1}
+            onAfterChange={this.handleAttackChange}
+            onChange={this.handleAttackUpdate}
+            marks={{0: {color: '#2199e8', label: '0 ms'}, 20: {label: '20 ms'}}}
+          />
           <b>Decay</b>
-          <Rcslider id={'envelope-decay-input'} defaultValue={this.state.decay}
-            min={1} max={100} onChange={this.handleDecayChange} marks={{1: {color: '#3adb76', label: '0 ms'}, 100: {label: '100 ms'}}} />
+          <Rcslider
+            id={'envelope-decay-input'}
+            value={this.state.newDecay}
+            min={1}
+            max={100}
+            onAfterChange={this.handleDecayChange}
+            onChange={this.handleDecayUpdate}
+            marks={{1: {color: '#3adb76', label: '0 ms'}, 100: {label: '100 ms'}}}
+          />
           <b>Sustain</b>
-          <Rcslider id={'envelope-sustain-input'} defaultValue={this.state.sustain}
-            min={0} max={100} onChange={this.handleSustainChange} marks={{0: {color: '#777777', label: '0% gain'}, 100: {label: '100% gain'}}} />
+          <Rcslider
+            id={'envelope-sustain-input'}
+            value={this.state.newSustain}
+            min={0}
+            max={100}
+            onAfterChange={this.handleSustainChange}
+            onChange={this.handleSustainUpdate}
+            marks={{0: {color: '#777777', label: '0% gain'}, 100: {label: '100% gain'}}}
+          />
           <b>Release</b>
-          <Rcslider id={'envelope-release-input'} defaultValue={this.state.release}
-            min={0} max={100} onChange={this.handleReleaseChange} marks={{0: {color: '#ec5840', label: '0 ms'}, 100: {label: '100 ms'}}} />
+          <Rcslider
+            id={'envelope-release-input'}
+            value={this.state.newRelease}
+            min={0}
+            max={100}
+            onAfterChange={this.handleReleaseChange}
+            onChange={this.handleReleaseUpdate}
+            marks={{0: {color: '#ec5840', label: '0 ms'}, 100: {label: '100 ms'}}}
+          />
         </div>
       </div>
     )

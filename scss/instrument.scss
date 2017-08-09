@@ -1,19 +1,6 @@
 html {
-    max-width: 100%;
-    overflow-x: hidden;
-}
-
-.container {
-  background-color: #fff;
-  padding:          10px;
-}
-
-#envelope-graph {
-  border-radius:    3px;
-  border-color:     #cdc;
-  border-width:     1px;
-  border-style:     solid;
-  width:            100%;
+  max-width:  100%;
+  overflow-x: hidden;
 }
 
 .button-container {
@@ -25,7 +12,11 @@ html {
 }
 
 .play-control-button {
-  flex-grow: 1;
+  flex: 1;
+}
+
+#react-web-instrument {
+  flex: 1;
 }
 
 #footer {
@@ -54,6 +45,31 @@ html {
   margin-bottom: 60px;
   display: flex;
   justify-content: center;
+
+  @media screen and (max-width: 640px) {
+    flex-flow: column;
+  }
+
+  @media screen and (min-width: 640px) {
+    flex-flow: row;
+  }
+}
+
+#content {
+  display: flex;
+  justify-content: space-between;
+
+  @media screen and (max-width: 640px) {
+    flex-flow: column;
+  }
+
+  @media screen and (min-width: 640px) {
+    flex-flow: row nowrap;
+  }
+}
+
+.inline {
+  display: inline;
 }
 
 .larger {
@@ -61,11 +77,108 @@ html {
   font-size: 20px;
 }
 
-.rc-slider {
-  margin: 15px;
-  width: 95%;
+.instrument-container {
+  display: flex;
+  flex: 1;
+
+  @media screen and (max-width: 640px) {
+    justify-content: flex-start;
+  }
+
+  @media screen and (min-width: 640px) {
+    justify-content: center;
+  }
+
+  .instrument-inner-container {
+    max-width: 900px;
+  }
+
+  .rc-slider {
+    margin: 15px;
+    width: 95%;
+  }
+
+  .overtone-slider {
+    margin-bottom: 30px;
+  }
+  .name-container {
+    display: flex;
+    .fa {
+      cursor: pointer;
+    }
+  }
+  .web-instrument {
+    display:         flex;
+    justify-content: space-between;
+
+    @media screen and (max-width: 640px) {
+      flex-flow: column;
+    }
+
+    @media screen and (min-width: 640px) {
+      flex-flow: row wrap;
+    }
+  }
+  .container {
+    width:   45%;
+    padding: 10px;
+  }
+  #envelope-graph {
+    border-radius:    3px;
+    border-color:     #cdc;
+    border-width:     1px;
+    border-style:     solid;
+    width:            100%;
+  }
 }
 
-.overtone-slider {
-  margin-bottom: 30px;
+
+.instrument-picker {
+  display: flex;
+  flex-flow: column;
+  align-items: center;
+  justify-content: flex-start;
+  margin-top: 1em;
+  margin-right: 1em;
+
+  .new-instrument {
+    cursor: pointer;
+    transition: all 300ms;
+    margin-bottom: 1em;
+  }
+
+  .visualiser-container {
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
+    justify-content: space-around;
+
+    &:last-child {
+      margin-right: 0px;
+    }
+
+    .top-instrument-container {
+      flex: 1;
+      cursor: pointer;
+      margin-right: 5px;
+      display: flex;
+      align-items: center;
+
+      .instrument-visualiser {
+        transition: all 300ms;
+      }
+
+      .instrument-visualiser:hover {
+        box-shadow: 0px 0px 2px 3px rgba(0, 0, 0, 0.2);
+      }
+      .active-instrument {
+        box-shadow: 0px 0px 2px 3px rgba(120, 0, 0, 0.2);
+      }
+
+      .mute-button {
+        margin-right: 1em;
+        width: 1em;
+      }
+    }
+  }
 }
