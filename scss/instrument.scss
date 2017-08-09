@@ -46,6 +46,11 @@ html {
   display: flex;
   justify-content: center;
 
+  .fa-circle-o-notch {
+    margin-left: 50%;
+    margin-top: 2em;
+  }
+
   @media screen and (max-width: 640px) {
     flex-flow: column;
   }
