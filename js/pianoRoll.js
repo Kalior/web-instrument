@@ -100,15 +100,16 @@ export default class PianoRollContainer extends React.Component {
     this.props.onFrequencyArrayChange(newFrequencyArray);
   };
   render() {
+    const {frequencyArray, currentBeat} = this.props;
     let piano = [];
-    for (let i = 0; i < this.props.frequencyArray.length - 1; i++) {
+    for (let i = 0; i < frequencyArray.length - 1; i++) {
       let classes = "piano-key";
       if (isWhiteArray[i]) {
         classes += " white-key";
       } else {
         classes += " black-key";
       }
-      if (this.props.frequencyArray[i]) {
+      if (frequencyArray[i]) {
         classes += " selected";
       }
       piano.push(
@@ -124,13 +125,14 @@ export default class PianoRollContainer extends React.Component {
     let pianoRoll = [];
     for (var i = 0; i < 16; i++) {
       let pianoRollRow = [];
-      for (var j = 0; j < this.props.frequencyArray.length - 1; j++) {
-        if (this.props.frequencyArray[j]) {
+      for (var j = 0; j < frequencyArray.length - 1; j++) {
+        if (frequencyArray[j]) {
           let classes = "piano-roll-element";
           if (this.props.notesGrid[i][j]) {
             classes += " selected";
           }
-          if (i === this.props.currentBeat) {
+          const currentBeatAdjustedForDelay = (currentBeat - 2 + 16) % 16
+          if (i === currentBeatAdjustedForDelay) {
             classes += " current-beat";
           }
           pianoRollRow.push(

@@ -235,6 +235,7 @@ export default class MainView extends React.Component {
     this.state.playWorker.terminate();
   };
   playMelodyBeat(secondsPerBeat, currentBeat, limiter, context, instrument) {
+    const startTime = context.currentTime + secondsPerBeat * 2 * 0.25
     for (let i = 0; i < instrument.frequencyArray.length - 1; i++) {
       if (currentBeat > 0) {
         if (
@@ -244,7 +245,7 @@ export default class MainView extends React.Component {
         ) {
           this.playSound(
             toneFrequencies[i],
-            context.currentTime,
+            startTime,
             0.25 * secondsPerBeat * this.toneLength(i, currentBeat, instrument.notesGrid),
             limiter,
             instrument.visualiser,
@@ -258,7 +259,7 @@ export default class MainView extends React.Component {
       ) {
         this.playSound(
           toneFrequencies[i],
-          context.currentTime,
+          startTime,
           0.25 * secondsPerBeat * this.toneLength(i, currentBeat, instrument.notesGrid),
           limiter,
           instrument.visualiser,
